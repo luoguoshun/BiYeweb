@@ -12,6 +12,7 @@ VueRouter.prototype.push = function push(to) {
 const isAuth = false; //是否需要认证
 const keepAlive = true; //保持组件状态
 const routes = [
+  //基础路由
   {
     path: '/login',
     name: 'login',
@@ -22,10 +23,32 @@ const routes = [
     name: 'notfound',
     component: () => import('@/views/errors/404'),
   },
+  //业务路由
   {
     path: '/',
     name: 'index',
     component: () => import(`@/layout/Index`),
+    redirect: () => {
+      // 否则判Token时间是否失效
+      const token = store.getters['token/accessToken'];
+      const expiresTime = store.getters['token/expiresTime'];
+      const groupId = 2;
+      if (!token && !token.length) {
+        return '/login';
+      }
+      // 根据组别 ID 进行跳转
+      switch (groupId) {
+        // 管理员跳去仪表盘
+        case 1:
+          return '/dashboard';
+        // 普通用户跳去首页
+        case 2:
+          return '/home';
+        // 其他都认为未登录，跳去登录页
+        default:
+          return '/login';
+      }
+    },
     meta: {
       title: '',
       isAuth: isAuth,
@@ -53,7 +76,7 @@ const routes = [
         },
         children: [
           {
-            path: '/system/user',
+            path: 'user',
             name: 'user',
             component: () => import(`@/views/system//user/index`),
             meta: {
@@ -63,13 +86,53 @@ const routes = [
             },
           },
           {
-            path: '/system/role',
+            path: 'role',
             name: 'role',
             component: () => import(`@/views/system/role/index`),
             meta: {
               title: '角色管理',
               isAuth: isAuth,
               keepAlive: keepAlive,
+            },
+          },
+          {
+            path: 'department',
+            name: 'department',
+            component: () => import(`@/views/system/role/index`),
+            meta: {
+              title: '部门管理',
+              isAuth: isAuth,
+              keepAlive: keepAlive,
+            },
+          },
+        ],
+      },
+      //日志管理
+      {
+        path: '/logs',
+        name: 'logs',
+        component: RouteView,
+        meta: {
+          title: '日志管理',
+          isAuth: true,
+        },
+        children: [
+          {
+            path: 'operateLog',
+            name: 'operateLog',
+            component: () => import('@/views/logs/operateLog'),
+            meta: {
+              title: '操作日志',
+              isAuth: true,
+            },
+          },
+          {
+            path: 'systemLog',
+            name: 'systemLog',
+            component: () => import('@/views/logs/systemLog'),
+            meta: {
+              title: '系统日志',
+              isAuth: true,
             },
           },
         ],
@@ -81,10 +144,10 @@ const router = new VueRouter({
   mode: 'hash',
   routes,
 });
-//全局前置守卫（路由跳转前执行）
-router.beforeEach(async (to, from, next) => {
+//全局前置导航守卫（路由跳转前执行）
+router.beforeEach((to, from, next) => {
+  document.title = to.meta.title || '绩效考核系统';
   // 路由对象的matched属性是一个数组，包含了当前路由的所有嵌套路径片段的路由记录。
-  // 只需要给较高一级的路由添加isAuth即可，其下的所有子路由不必添加。
   //  找到了满足条件的元素,return true,循环结束。如果所有元素全部遍历还是没找到, 最终结果为false
   const isAuth = to.matched.some((i) => i.meta.isAuth == true);
   if (isAuth) {
@@ -92,7 +155,7 @@ router.beforeEach(async (to, from, next) => {
     const accessToken = store.getters['token/accessToken'];
     const expiresTime = store.getters['token/expiresTime'];
     let isExpires = new Date().getTime() > expiresTime;
-    if (accessToken == null || isExpires) {
+    if (isExpires || accessToken == null) {
       Message.warning('凭证过期，请重新登录!');
       next({
         name: 'login',

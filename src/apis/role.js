@@ -1,11 +1,15 @@
 import axios from '@/utils/axios';
 export default {
-  //获取角色列表
+  /** 
+   * @description: 获取角色列表
+   **/  
   getRoleList() {
     return axios.post('/api/Background/Role/GetRoleList');
   },
-
-  //添加角色
+  /** 
+   * @description: 添加角色
+   * @param {*} RoleForm:
+   **/  
   addRole(RoleForm) {
     return axios.post('/api/Background/Role/AddRole', {
       ...RoleForm,
@@ -25,7 +29,6 @@ export default {
       ...RoleForm,
     });
   },
-
   //删除角色
   deleteRoleIdById(roleIds) {
     return axios.post('/api/Background/Role/DeleteRolesById', roleIds);

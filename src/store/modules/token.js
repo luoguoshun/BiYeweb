@@ -7,17 +7,11 @@ export default {
   },
   //加工state成员给外界
   getters: {
-    accessToken(state) {
-      if (state.accessToken == null) {
-        return null;
-      }
-      return state.accessToken;
+    accessToken: (state) => {
+      return state.accessToken ? null : state.accessToken;
     },
-    expiresTime(state) {
-      if (state.accessToken == null) {
-        return null;
-      }
-      return state.expiresTime;
+    expiresTime: (state) => {
+      return state.accessToken ? null : state.expiresTime;
     },
   },
   // 操作state成员
@@ -27,7 +21,7 @@ export default {
       state['expiresTime'] = new Date().getTime() + tokenInfo['expiresIn'];
     },
     clearToken(state) {
-      localStorage.removeItem('tokenData');
+      localStorage.removeItem('token');
     },
   },
 };

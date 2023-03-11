@@ -8,8 +8,8 @@ export default {
     },
   },
   getters: {
-    getDynamicTags(state) {
-      return state.dynamicTag;
+    getDynamicTags: (state) => {
+      return state.dynamicTag ? null : state.dynamicTag;
     },
   },
   mutations: {
