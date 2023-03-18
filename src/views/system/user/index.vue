@@ -74,9 +74,7 @@
           <el-button v-if="scope.row.noteSrc == null || scope.row.noteSrc == ''" type="primary" @click="openuploadNoteDialog(scope.row)" size="mini">
             上传简历
           </el-button>
-          <el-button v-else type="primary" @click="openuploadNoteDialog(scope.row)" size="mini">
-            预览
-          </el-button>
+          <el-button v-else type="primary" @click="notePreview(scope.row)" size="mini"> 预览 </el-button>
         </template>
       </el-table-column>
       <el-table-column fixed="right" label="操作" align="center">
@@ -186,12 +184,19 @@
         <div class="el-upload__tip" slot="tip">只能上传jpg/png文件，且不超过500kb</div>
       </el-upload></el-dialog
     >
+    <el-dialog title="简历预览" center :visible.sync="dialogObject.notepreviewVisible" :close-on-click-modal="false" width="60%">
+      <pdf ref="pdf" v-for="i in numPages" :key="i" :src="noteSrc" :page="i"></pdf>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { leaveTime } from '@/utils/timeFormat';
+import pdf from 'vue-pdf';
 export default {
+  components: {
+    pdf,
+  },
   data() {
     // 验证手机号的规则
     const cheackMobile = (rule, value, callback) => {
@@ -255,6 +260,7 @@ export default {
         updateVisible: false,
         addVisible: false,
         uploadNoteVisible: false,
+        notepreviewVisible: false,
       },
       userForm: {
         employeeId: '',
@@ -298,6 +304,8 @@ export default {
       // provinceAndCity,
       search: { current: 1, size: 6 },
       noteFileList: [],
+      numPages: '', //pdf总页数
+      noteSrc: '',
     };
   },
   methods: {
@@ -475,7 +483,6 @@ export default {
         });
       }
     },
-
     //打开修改弹窗
     openUpdateDiolog(row) {
       this.userForm = { ...row };
@@ -486,7 +493,6 @@ export default {
       }
       this.dialogObject.updateVisible = true;
     },
-
     //修改用户数据
     updateUserInfo() {
       const user = {
@@ -557,6 +563,21 @@ export default {
             this.loadData();
           }
         });
+      }
+    },
+    //在线预览简历
+    notePreview(row) {
+      this.dialogObject.notepreviewVisible = true;
+      this.noteSrc = row.noteSrcUrl;
+      if (this.noteSrc.indexOf('pdf')) {
+        let loadingTask = pdf.createLoadingTask(row.noteSrcUrl);
+        loadingTask.promise
+          .then((pdf) => {
+            this.numPages = pdf.numPages;
+          })
+          .catch((err) => {
+            console.error('pdf 加载失败', err);
+          });
       }
     },
     //#region
