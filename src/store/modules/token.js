@@ -8,10 +8,11 @@ export default {
   //加工state成员给外界
   getters: {
     accessToken: (state) => {
-      return state.accessToken ? null : state.accessToken;
+      //当左侧值为 null 或 undefined 时，返回 ?? 符号右边的值
+      return state.accessToken ?? '';
     },
     expiresTime: (state) => {
-      return state.accessToken ? null : state.expiresTime;
+      return state.expiresTime ?? 0;
     },
   },
   // 操作state成员

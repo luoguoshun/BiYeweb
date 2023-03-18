@@ -63,7 +63,7 @@
         </el-form-item>
         <el-form-item label="部门主管" prop="leaderId">
           <el-select size="mini" v-model="departmentForm.leaderId" filterable placeholder="请选择员工">
-            <el-option v-for="item in userInfo" :key="item.userId" :label="item.name" :value="item.userId"> </el-option>
+            <el-option v-for="item in userInfo" :key="item.employeeId" :label="item.employeeName" :value="item.employeeId"> </el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="部门简介">
@@ -102,7 +102,6 @@ export default {
         description: '',
         leaderId: '',
       },
-
       userInfo: [{ leaderId: '', leaderName: '请选择用户' }],
     };
   },
@@ -114,7 +113,7 @@ export default {
     },
     //获取部门数据
     async GetDepartmentList() {
-      await this.$api.department.GetDepartmentList().then((res) => {
+      await this.$api.department.getDepartmentList().then((res) => {
         const { data, success, message } = res.data;
         console.log(data);
         if (!success) {
@@ -126,13 +125,12 @@ export default {
     },
     //获取用户数据
     async getUserList() {
-      await this.$api.user.GetUserList(this.queryForm.page, this.queryForm.row, this.queryForm.conditions, this.queryForm.roleId).then((res) => {
-        const { data, success, message } = res.data;
-        if (!success) {
-          console.log(message);
-          return;
+      await this.$api.employee.getUserList(this.queryForm.page, this.queryForm.row, this.queryForm.conditions, this.queryForm.roleId).then((res) => {
+        const { data } = res.data;
+        if (data) {
+          this.userInfo = data;
         }
-        this.userInfo = data.users;
+        console.log(data);
       });
     },
     //打开修改弹窗
@@ -154,8 +152,8 @@ export default {
         leaderId: this.departmentForm.leaderId,
       };
       this.$api.department.UpdateDepartment(department).then((res) => {
-        const { data, success, message } = res.data;
-        if (!success) {
+        const { data, resultType } = res.data;
+        if (!data) {
           this.$message({ message: '修改失败！', type: 'error' });
         } else {
           this.$message({ message: '修改成功！', type: 'success' });
@@ -164,14 +162,13 @@ export default {
         }
       });
     },
-
     //打开添加弹窗弹窗
     openCreateDialog() {
       this.dialogObject.createVisible = true; //打开添加弹窗
-      this.departmentForm.departmentId = row.departmentId;
-      this.departmentForm.departmentName = row.departmentName;
-      this.departmentForm.description = row.description;
-      this.departmentForm.leaderId = row.leaderId;
+      this.departmentForm.departmentId = '';
+      this.departmentForm.departmentName = '';
+      this.departmentForm.description ='';
+      this.departmentForm.leaderId = '';
     },
     //添加部门数据
     AddDepartment() {
@@ -182,8 +179,8 @@ export default {
         leaderId: this.departmentForm.leaderId,
       };
       this.$api.department.AddDepartment(department).then((res) => {
-        const { data, success, message } = res.data;
-        if (!success) {
+        const { data, resultType } = res.data;
+        if (!data) {
           this.$message({ message: '添加失败！', type: 'error' });
         } else {
           this.$message({ message: '添加成功！', type: 'success' });

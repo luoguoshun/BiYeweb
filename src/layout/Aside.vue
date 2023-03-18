@@ -18,12 +18,12 @@
       :key="item.name"
       @click.native="createTab({ tabName: item['label'], routeName: item.name })"
     >
-      <i :class="'el-icon-' + item.icon"></i>
+      <i :class="item.icon"></i>
       <span slot="title">{{ item.label }}</span>
     </el-menu-item>
     <el-submenu :index="item.label" v-for="item in hasChildren" :key="item.path">
       <template slot="title">
-        <i :class="'el-icon-' + item.icon"></i>
+        <i :class="item.icon"></i>
         <span slot="title">{{ item.label }}</span>
       </template>
       <el-menu-item-group>
@@ -33,18 +33,16 @@
           :key="subItem.name"
           @click.native="createTab({ tabName: subItem['label'], routeName: subItem.name })"
         >
-          <i :class="'el-icon-' + subItem.icon"></i>
+          <i :class="subItem.icon"></i>
           <span slot="title">{{ subItem.label }}</span>
         </el-menu-item>
       </el-menu-item-group>
     </el-submenu>
   </el-menu>
 </template>
-
 <script>
 import store from '@/store';
 import { mapGetters, mapMutations } from 'vuex';
-import { menus } from '@/enums/menu';
 export default {
   computed: {
     /**
@@ -71,7 +69,7 @@ export default {
   },
   data() {
     return {
-      menus,
+      menus:[],
     };
   },
   methods: {
@@ -84,11 +82,11 @@ export default {
     },
   },
   created() {
-    // //获取菜单数据
-    // this.$api.mock.getMenuList().then((res) => {
-    //   const { code, success, data } = res.data;
-    //   this.menu = data;
-    // });
+    //获取菜单数据
+    this.$api.mock.getMenuList().then((res) => {
+      const { code, success, data } = res.data;
+      this.menus = data;
+    });
   },
 };
 </script>
