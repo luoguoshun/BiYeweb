@@ -28,7 +28,7 @@ export default {
      * @description: 切换组件
      * @param {*} tab: 标签对象
      * @return {*}
-     */    
+     */
     switchComponent(tab) {
       let routeName = tab.$vnode.data.key;
       if (this.$route.path !== routeName) {
@@ -40,7 +40,7 @@ export default {
      * @description: 删除tag标签并跳转路由
      * @param {*} routeName:  要删除的tag携带的路由
      * @return {*}
-     */    
+     */
     removeTab(routeName) {
       this.delTagFromArray(routeName);
       if (routeName == this.$route.name) {
