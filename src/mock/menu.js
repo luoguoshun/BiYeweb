@@ -27,6 +27,30 @@ export default {
               label: "角色管理",
               icon: "setting",
             },
+            {
+              path: "/system/department",
+              name: "department",
+              label: "部门管理",
+              icon: "setting",
+            },
+          ],
+        },
+        {
+          label: "日志管理",
+          icon: "location",
+          children: [
+            {
+              path: "/logs/systemLog",
+              name: "systemLog",
+              label: "系统日志",
+              icon: "setting",
+            },
+            {
+              path: "/logs/operateLog",
+              name: "operateLog",
+              label: "操作日志",
+              icon: "setting",
+            },
           ],
         },
       ],

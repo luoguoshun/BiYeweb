@@ -52,14 +52,14 @@ export default {
      * @return {*}
      */
     noChildren: function () {
-      return this.menu.filter((item) => !item.children);
+      return this.menus.filter((item) => !item.children);
     },
     /**
      * @description: 有子菜单 (这样设置会有一个问题 就是有子菜单的 永远会在没有子菜单的下面
      * @return {*}
      */
     hasChildren: function () {
-      return this.menu.filter((item) => item.children);
+      return this.menus.filter((item) => item.children);
     },
     /**
      * @description: 是否折叠
@@ -71,7 +71,7 @@ export default {
   },
   data() {
     return {
-      menu: menus,
+      menus,
     };
   },
   methods: {

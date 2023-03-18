@@ -92,7 +92,7 @@ export default {
       },
     };
   },
-  methods: {   
+  methods: {
     gethomeData() {
       this.$api.mock.gethomeData().then((res) => {
         res = res.data;
