@@ -25,8 +25,8 @@ export default {
     });
   },
   //获取操作日志列表
-  getOperateLogLogList(page, row, conditions, type, publicationDates) {
-    return axios.post('/api/Background/Log/GetOperateLogLogList', {
+  getOperateLogList(page, row, conditions, type, publicationDates) {
+    return axios.post('/api/Background/Log/GetOperateLogList', {
       Page: page,
       Row: row,
       Conditions: conditions,

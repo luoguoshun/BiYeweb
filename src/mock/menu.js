@@ -52,7 +52,7 @@ export default {
           icon: "el-icon-time",
           children: [
             {
-              path: "/system/systemLog",
+              path: "/logs/systemLog",
               name: "systemLog",
               label: "系统日志",
               icon: "setting",

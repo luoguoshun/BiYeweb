@@ -4,9 +4,9 @@
       <!--shadow属性设置卡片阴影出现的时机-->
       <el-card shadow="hover">
         <div class="user">
-          <img :src="userImg" />
+          <img :src="userInfo.headerImgUrl" />
           <div class="userinfo">
-            <p class="name">Admin</p>
+            <p class="name">{{ userInfo.employeeName }}</p>
             <p class="access">超级管理员</p>
           </div>
         </div>
@@ -41,6 +41,7 @@
 </template>
 
 <script>
+import {mapGetters  } from "vuex";
 export default {
   data() {
     return {
@@ -91,6 +92,9 @@ export default {
         totalBuy: '总购买',
       },
     };
+  },
+  computed:{
+    ...mapGetters({ userInfo: 'userInfo/getUserInfo' })
   },
   methods: {
     gethomeData() {

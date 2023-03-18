@@ -10,9 +10,10 @@
       </el-breadcrumb>
     </div>
     <div class="r-content">
+      <span>[{{userInfo.employeeName}}]</span>
       <el-dropdown trigger="click" size="mini">
         <span class="el-dropdown-link">
-          <img :src="userImg" class="user" />
+          <img :src="userInfo.headerImgUrl" class="user" />
         </span>
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item>个人中心</el-dropdown-item>
@@ -25,12 +26,18 @@
 
 <script>
 import { mapGetters, mapMutations } from 'vuex';
+import store from '@/store';
 export default {
   data() {
     return {
-      userImg: require('../assets/images/user.png'),
+      // userImg: require('../assets/images/user.png'),
+     
       breadcrumbList: [],
-    };
+    }
+  },
+  computed:{
+    ...mapGetters({ userInfo: 'userInfo/getUserInfo' })
+    // userImg:()=>
   },
   methods: {
     ...mapMutations({
@@ -83,6 +90,16 @@ header {
 }
 
 .r-content {
+  display: flex;
+  flex-direction: row;
+  text-align: center;
+  justify-content: center;
+  >:first-child{
+    color: #ffffff;
+    margin-right: 10px;
+    // margin-bottom: 20px;
+    line-height: 40px;
+  }
   .user {
     width: 40px;
     height: 40px;
@@ -101,6 +118,7 @@ header {
   &:last-child {
     .el-breadcrumb__inner {
       color: #ffffff;
+  
     }
   }
 }

@@ -3,9 +3,7 @@
     <!-- 操作 -->
     <div class="editbar">
       <div class="edit_btn">
-        <el-button type="danger" size="mini" class="el-icon-delete" @click="deleteLogs()">
-          移除
-        </el-button>
+        <el-button type="danger" size="mini" class="el-icon-delete" @click="deleteLogs()"> 移除 </el-button>
         <!-- <el-button type="warning" size="mini" @click="exportLog()">
           导出数据
         </el-button> -->
@@ -38,7 +36,7 @@
       <el-table-column prop="message" label="错误信息" align="center"></el-table-column>
       <el-table-column label="时间" align="center" sortable="true" width="150" sort-by>
         <template slot-scope="scope">
-          {{ $timeFormat.leaveTime(scope.row.LogDate) }}
+          {{ leaveTime(scope.row.LogDate) }}
         </template>
       </el-table-column>
       <!-- <el-table-column fixed="right" label="操作" width="100" align="center">
@@ -85,6 +83,8 @@
 </template>
 
 <script>
+import { leaveTime } from "@/utils/timeFormat";
+
 export default {
   data() {
     return {
@@ -119,6 +119,7 @@ export default {
     };
   },
   methods: {
+    leaveTime,
     //导出日志数据
     exportLog() {
       if (this.logIds.length == 0) {
@@ -144,13 +145,13 @@ export default {
       await this.$api.log
         .getLogList(this.queryForm.page, this.queryForm.row, this.queryForm.conditions, this.queryForm.level, this.queryForm.publicationDates)
         .then((res) => {
-          const { data, success, message } = res.data;
-          if (!success) {
+          const { data, count, message } = res.data;
+          if (!data) {
             console.log(message);
             return;
           } else {
-            this.table.logData = data.logs;
-            this.table.total = data.count;
+            this.table.logData = data;
+            this.table.total = count;
           }
         });
     },
@@ -248,7 +249,7 @@ export default {
     .edit_query {
       width: 100%;
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr 0.4fr 0.4fr ;
+      grid-template-columns: 1fr 1fr 1fr 0.4fr 0.4fr;
       grid-column-gap: 5px;
     }
   }

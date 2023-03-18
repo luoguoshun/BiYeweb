@@ -187,10 +187,10 @@ export default {
       } else {
         this.$api.role.exportRoleDataToExcel(this.roleIds).then((res) => {
           const { data, success, message } = res.data;
-          if (!success) {
+          if (data == '') {
             this.$message({ message: message, type: 'error' });
           } else {
-            window.open(baseUrl + message, '_self');
+            window.open(baseUrl + data, '_self');
           }
         });
       }

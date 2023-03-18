@@ -3,12 +3,8 @@
     <!-- 操作 -->
     <div class="editbar">
       <div class="edit_btn">
-        <el-button type="danger" size="mini" class="el-icon-delete" @click="deleteOperateRecords()">
-          移除
-        </el-button>
-        <el-button type="warning" size="mini" @click="exportOperateRecords()">
-          导出数据
-        </el-button>
+        <el-button type="danger" size="mini" class="el-icon-delete" @click="deleteOperateRecords()"> 移除 </el-button>
+        <el-button type="warning" size="mini" @click="exportOperateRecords()"> 导出数据 </el-button>
       </div>
       <div class="edit_query">
         <el-date-picker v-model="queryForm.publicationDates" type="daterange" start-placeholder="开始日期" end-placeholder="结束日期" size="mini">
@@ -49,9 +45,9 @@
         </template>
       </el-table-column>
       <!-- <el-table-column prop="detail" label="详细信息" align="center"></el-table-column> -->
-      <el-table-column label="时间"  align="center" sortable="true" sort-by>
+      <el-table-column label="时间" align="center" sortable="true" sort-by>
         <template slot-scope="scope">
-          {{ $timeFormat.leaveTime(scope.row.createTime) }}
+          {{ leaveTime(scope.row.createTime) }}
         </template>
       </el-table-column>
       <!-- <el-table-column fixed="right" label="操作" width="100" align="center">
@@ -99,6 +95,7 @@
 
 <script>
 import { baseUrl } from '@/config/defaultString.js';
+import { leaveTime } from "@/utils/timeFormat";
 export default {
   data() {
     return {
@@ -133,6 +130,7 @@ export default {
     };
   },
   methods: {
+    leaveTime,
     //导出操作日志数据
     exportOperateRecords() {
       if (this.operateIds.length == 0) {
@@ -155,17 +153,17 @@ export default {
     async getOperateLogLogList() {
       let queryForm = JSON.parse(JSON.stringify(this.queryForm));
       queryForm.type = queryForm.type == '' ? 0 : parseInt(queryForm.type);
-      console.log(queryForm);
       await this.$api.log
-        .getOperateLogLogList(queryForm.page, queryForm.row, queryForm.conditions, queryForm.type, queryForm.publicationDates)
-        .then((res) => {
-          const { data, success, message } = res.data;
-          if (!success) {
+        .getOperateLogList(queryForm.page, queryForm.row, queryForm.conditions, queryForm.type, queryForm.publicationDates)
+        .then((res) => {    
+          const { data, count, message } = res.data;
+          if (!data) {
             console.log(message);
             return;
           } else {
-            this.table.logData = data.operateLogs;
-            this.table.total = data.count;
+            console.log(res.data);
+            this.table.logData = data;
+            this.table.total = count;
           }
         });
     },
@@ -267,7 +265,7 @@ export default {
     .edit_query {
       width: 100%;
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr 0.4fr 0.4fr ;
+      grid-template-columns: 1fr 1fr 1fr 0.4fr 0.4fr;
       grid-column-gap: 5px;
     }
   }

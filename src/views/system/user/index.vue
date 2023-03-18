@@ -69,12 +69,15 @@
           />
         </template>
       </el-table-column>
-      <el-table-column prop="noteSrc" label="简历" align="center">
+      <el-table-column prop="noteSrc" label="简历" align="center" width="200px">
         <template slot-scope="scope">
           <el-button v-if="scope.row.noteSrc == null || scope.row.noteSrc == ''" type="primary" @click="openuploadNoteDialog(scope.row)" size="mini">
             上传简历
           </el-button>
-          <el-button v-else type="primary" @click="notePreview(scope.row)" size="mini"> 预览 </el-button>
+          <el-button v-else type="primary" @click="openuploadNoteDialog(scope.row)" size="mini"> 重新上传 </el-button>
+          <el-button v-if="scope.row.noteSrc !== '' && scope.row.noteSrc != null" type="primary" @click="notePreview(scope.row)" size="mini">
+            预览
+          </el-button>
         </template>
       </el-table-column>
       <el-table-column fixed="right" label="操作" align="center">
@@ -402,8 +405,8 @@ export default {
         });
       } else {
         this.$api.employee.deleteUsersById(this.userIds).then((res) => {
-          let { success, message } = res.data;
-          if (!success) {
+          let { data,success, message } = res.data;
+          if (!data) {
             console.log(message);
             this.$message.error('删除失败！');
           } else {
