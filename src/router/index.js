@@ -32,8 +32,9 @@ const routes = [
       // 否则判Token时间是否失效
       const token = store.getters['token/accessToken'];
       const expiresTime = store.getters['token/expiresTime'];
+      let isExpires = new Date().getTime() > expiresTime;
       const groupId = 2;
-      if (!token && !token.length) {
+      if (!token && !token.length && !isExpires) {
         return '/login';
       }
       // 根据组别 ID 进行跳转
@@ -105,6 +106,16 @@ const routes = [
               keepAlive: keepAlive,
             },
           },
+          {
+            path: 'dictionary',
+            name: 'dictionary',
+            component: () => import(`@/views/system/dictionary/index`),
+            meta: {
+              title: '字典管理',
+              isAuth: isAuth,
+              keepAlive: keepAlive,
+            }
+          }
         ],
       },
       //考核管理
@@ -113,7 +124,7 @@ const routes = [
         name: 'examine',
         meta: {
           title: '考勤管理',
-          isAuth: true,
+          isAuth: false,
         },
         component: () => import(`@/views/examine`),
       },
@@ -123,10 +134,9 @@ const routes = [
         name: 'workAttendance',
         meta: {
           title: '考勤管理',
-          isAuth: true,
+          isAuth: false,
         },
         component: () => import(`@/views/workAttendance`),
-
       },
       //日志管理
       {

@@ -1,3 +1,7 @@
+<!--
+ * @LastEditTime: 2023-03-20 17:59:21
+ * @Descripttion: 
+-->
 <template>
   <div id="content">
     <el-tabs v-model="getDynamicTags.activeRoute" @tab-remove="removeTab" @tab-click="switchComponent">
@@ -59,6 +63,9 @@ export default {
   #dynamic-content {
     width: 100%;
     min-height: 850px;
+    .el-card__body{
+      // padding:10px ;
+    }
   }
 }
 </style>
