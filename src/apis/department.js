@@ -3,7 +3,7 @@ import axios from "../utils/axios"
 export default{
 
   //获取部门列表
-  GetDepartmentList() {
+  getDepartmentList() {
     return axios.post('/api/Background/Department/GetDepartmentList');
   },
 

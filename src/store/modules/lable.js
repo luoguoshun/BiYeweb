@@ -9,7 +9,7 @@ export default {
   },
   getters: {
     getDynamicTags: (state) => {
-      return state.dynamicTag ? null : state.dynamicTag;
+      return state.dynamicTag ?? '';
     },
   },
   mutations: {

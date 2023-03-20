@@ -98,7 +98,7 @@ const routes = [
           {
             path: 'department',
             name: 'department',
-            component: () => import(`@/views/system/role/index`),
+            component: () => import(`@/views/system/department/index`),
             meta: {
               title: '部门管理',
               isAuth: isAuth,
@@ -106,6 +106,27 @@ const routes = [
             },
           },
         ],
+      },
+      //考核管理
+      {
+        path: '/examine',
+        name: 'examine',
+        meta: {
+          title: '考勤管理',
+          isAuth: true,
+        },
+        component: () => import(`@/views/examine`),
+      },
+      //考勤管理
+      {
+        path: '/workAttendance',
+        name: 'workAttendance',
+        meta: {
+          title: '考勤管理',
+          isAuth: true,
+        },
+        component: () => import(`@/views/workAttendance`),
+
       },
       //日志管理
       {

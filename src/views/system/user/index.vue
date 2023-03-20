@@ -8,7 +8,7 @@
       </div>
       <div class="edit_query">
         <el-select size="mini" v-model="queryForm.roleId" placeholder="请选择角色类别">
-          <el-option v-for="item in roleTypes" :key="item.roleId" :label="item.name" :value="item.roleId"></el-option>
+          <el-option v-for="item in roleTypes" :key="item.roleId" :label="item.roleName" :value="item.roleId"></el-option>
         </el-select>
         <el-input v-model="queryForm.conditions" size="mini" label-width="80px" placeholder="请输入"></el-input>
         <el-button type="primary" @click="loadData()" size="mini">查找</el-button>
@@ -52,7 +52,7 @@
       </el-table-column>
       <el-table-column label="创建时间" align="center">
         <template slot-scope="scope">
-          {{ $timeFormat.leaveTime(scope.row.createTime) }}
+          {{ leaveTime(scope.row.createTime) }}
           <!-- {{ scope.row.createTime }} -->
         </template>
       </el-table-column>
@@ -64,14 +64,25 @@
             :active-value="1"
             active-color="rgb(0, 255, 149)"
             inactive-color="rgb(151, 148, 148)"
-            v-model="scope.row.state"
+            v-model="scope.row.status"
             @change="updateUserState(scope.row)"
           />
         </template>
       </el-table-column>
+      <el-table-column prop="noteSrc" label="简历" align="center" width="200px">
+        <template slot-scope="scope">
+          <el-button v-if="scope.row.noteSrc == null || scope.row.noteSrc == ''" type="primary" @click="openuploadNoteDialog(scope.row)" size="mini">
+            上传简历
+          </el-button>
+          <el-button v-else type="primary" @click="openuploadNoteDialog(scope.row)" size="mini"> 重新上传 </el-button>
+          <el-button v-if="scope.row.noteSrc !== '' && scope.row.noteSrc != null" type="primary" @click="notePreview(scope.row)" size="mini">
+            预览
+          </el-button>
+        </template>
+      </el-table-column>
       <el-table-column fixed="right" label="操作" align="center">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="openUpdateDiolog(scope.row)">查看</el-button>
+          <el-button type="primary" size="small" @click="openUpdateDiolog(scope.row)">查看</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -99,7 +110,7 @@
             <el-button style="margin-left: 10px" size="small" type="success" @click="$refs.upload.submit()">上传到服务器</el-button>
           </el-upload>
         </el-form-item>
-        <el-form-item label="用户名称"> <el-input v-model="userForm.name"></el-input> </el-form-item>
+        <el-form-item label="用户名称"> <el-input v-model="userForm.employeeName"></el-input> </el-form-item>
         <el-form-item label="性别">
           <el-radio-group v-model="userForm.sex" size="mini">
             <el-radio :label="1">男</el-radio>
@@ -114,7 +125,7 @@
         <el-form-item label="角色">
           <el-checkbox-group v-model="roleIds">
             <el-checkbox v-for="role in roleTypes" :label="role.roleId" :key="role.roleId">
-              {{ role.name }}
+              {{ role.roleName }}
             </el-checkbox>
           </el-checkbox-group>
         </el-form-item>
@@ -136,11 +147,11 @@
     <!-- 添加用户信息对话框 -->
     <el-dialog title="用户信息" center :visible.sync="dialogObject.addVisible" :close-on-click-modal="false" width="50%">
       <el-form :model="userForm" :rules="rules" ref="userForm" label-width="80px">
-        <el-form-item label="用户Id" prop="userId">
-          <el-input v-model="userForm.userId"></el-input>
+        <el-form-item label="用户Id" prop="employeeId">
+          <el-input v-model="userForm.employeeId"></el-input>
         </el-form-item>
-        <el-form-item label="用户名" prop="name">
-          <el-input v-model="userForm.name"></el-input>
+        <el-form-item label="用户名" prop="employeeName">
+          <el-input v-model="userForm.employeeName"></el-input>
         </el-form-item>
         <el-form-item label="性别">
           <el-radio-group v-model="userForm.sex" size="mini">
@@ -168,14 +179,27 @@
         <el-button type="success" @click="addUser()">添 加</el-button>
       </div>
     </el-dialog>
+    <!-- 简历上传 -->
+    <el-dialog title="简历上传" center :visible.sync="dialogObject.uploadNoteVisible" :close-on-click-modal="false" width="30%">
+      <el-upload class="upload-demo" drag action="" :http-request="uploadUserNote" :file-list="noteFileList">
+        <i class="el-icon-upload"></i>
+        <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+        <div class="el-upload__tip" slot="tip">只能上传jpg/png文件，且不超过500kb</div>
+      </el-upload></el-dialog
+    >
+    <el-dialog title="简历预览" center :visible.sync="dialogObject.notepreviewVisible" :close-on-click-modal="false" width="60%">
+      <pdf ref="pdf" v-for="i in numPages" :key="i" :src="noteSrc" :page="i"></pdf>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-// import { regionDataPlus } from 'element-china-area-data';
-// import provinceAndCity from '@/assets/js/province';
 import { leaveTime } from '@/utils/timeFormat';
+import pdf from 'vue-pdf';
 export default {
+  components: {
+    pdf,
+  },
   data() {
     // 验证手机号的规则
     const cheackMobile = (rule, value, callback) => {
@@ -238,16 +262,18 @@ export default {
       dialogObject: {
         updateVisible: false,
         addVisible: false,
+        uploadNoteVisible: false,
+        notepreviewVisible: false,
       },
       userForm: {
-        userId: '',
-        name: '',
+        employeeId: '',
+        employeeName: '',
         headerImgUrl: '',
         sex: 1,
         IdNumber: '',
         address: '',
         phone: '',
-        roleIdStr: '',
+        roleIds: '',
         state: 0,
         departmentId: '',
         areadata: '',
@@ -256,7 +282,7 @@ export default {
       userIds: [],
       roleTypes: [],
       rules: {
-        name: [
+        employeeName: [
           //^[\u4e00-\u9fa5]{0,}$ 纯汉字
           { required: true, message: '姓名', trigger: 'blur' },
           { min: 2, max: 8, message: '长度在 2到 8 个字符', trigger: 'blur' },
@@ -269,7 +295,7 @@ export default {
           { required: true, message: '身份证不能为空', trigger: 'blur' },
           { validator: cheackIdNumber, trigger: 'blur' },
         ],
-        userId: [
+        employeeId: [
           { required: true, message: '用户Id不能为空', trigger: 'change' },
           { min: 3, max: 16, message: '长度在 3 到 16 个字符', trigger: 'blur' },
           { validator: cheackUserId, trigger: 'blur' },
@@ -280,9 +306,13 @@ export default {
       selectedOptions: [],
       // provinceAndCity,
       search: { current: 1, size: 6 },
+      noteFileList: [],
+      numPages: '', //pdf总页数
+      noteSrc: '',
     };
   },
   methods: {
+    leaveTime,
     //导入数据
     importClients(param) {
       if (param.file.type != 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
@@ -311,14 +341,12 @@ export default {
     //获取用户数据
     async getUserList() {
       await this.$api.employee.getUserList(this.queryForm.page, this.queryForm.row, this.queryForm.conditions, this.queryForm.roleId).then((res) => {
-        const { data, success, message } = res.data;
-        if (!success) {
-          console.log(message);
-          return;
+        const { data, count } = res.data;
+        if (data) {
+          this.table.userList = data;
+          this.table.total = count;
         }
-
-        this.table.userList = data.data;
-        this.table.total = data.count;
+        console.log(data);
       });
     },
     //获取角色列表
@@ -334,13 +362,14 @@ export default {
     },
     //获取部门列表
     async getDepartmentList() {
-      await this.$api.department.GetDepartmentList().then((res) => {
-        const { data, success, message } = res.data;
-        if (!success) {
+      await this.$api.department.getDepartmentList().then((res) => {
+        const { data, message } = res.data;
+        if (!data) {
           console.log(message);
           return;
         }
         this.departmentList = data;
+        console.log(data);
       });
     },
     //重置搜索条件
@@ -363,7 +392,7 @@ export default {
     selectRows(selection) {
       this.userIds = [];
       selection.forEach((element) => {
-        this.userIds.push(element.userId);
+        this.userIds.push(element.employeeId);
       });
       console.log(this.userIds);
     },
@@ -376,8 +405,8 @@ export default {
         });
       } else {
         this.$api.employee.deleteUsersById(this.userIds).then((res) => {
-          let { success, message } = res.data;
-          if (!success) {
+          let { data,success, message } = res.data;
+          if (!data) {
             console.log(message);
             this.$message.error('删除失败！');
           } else {
@@ -390,8 +419,8 @@ export default {
     //打开添加弹窗
     openAddDialog() {
       this.dialogObject.addVisible = true;
-      this.userForm.userId = '';
-      this.userForm.name = '';
+      this.userForm.employeeId = '';
+      this.userForm.employeeName = '';
       this.userForm.sex = 1;
       this.userForm.address = '';
       this.userForm.phone = '';
@@ -403,21 +432,21 @@ export default {
       this.$refs['userForm'].validate((valid) => {
         if (valid) {
           const user = {
-            userId: this.userForm.userId,
-            name: this.userForm.name,
+            employeeId: this.userForm.employeeId,
+            employeeName: this.userForm.employeeName,
             sex: this.userForm.sex,
-            address: this.queryForm.areadata + this.userForm.address,
+            address: this.userForm.address,
             phone: this.userForm.phone,
             roleIds: this.roleIds,
             departmentId: this.userForm.departmentId,
           };
           this.$api.employee.addUser(user).then((res) => {
             const { data, success, message } = res.data;
-            if (!success) {
-              console.log(message);
+            if (!data) {
+              this.$message({ message, type: 'error' });
               return;
             }
-            this.$message({ message: '删除成功！', type: 'success' });
+            this.$message({ message, type: 'success' });
             this.dialogObject.addVisible = false;
             this.loadData();
           });
@@ -427,7 +456,7 @@ export default {
         }
       });
     },
-    //上传用户头像 
+    //上传用户头像
     uploadUserHeaderImg(param) {
       if (param.file.type != 'image/png' && param.file.type != 'image/gif' && param.file.type != 'image/jpg' && param.file.type != 'image/jpeg') {
         this.$notify.warning({
@@ -443,15 +472,15 @@ export default {
         //创建FormData对象(键值对集合) 将模型存在FormData中
         const formdata = new FormData();
         formdata.append('file', param.file);
-        formdata.append('userId', this.userForm.userId);
-        this.$api.employee.UploadUserHeadImg(formdata).then((res) => {
-          const { data, success, message } = res.data;
-          if (!success) {
+        formdata.append('employeeId', this.userForm.employeeId);
+        this.$api.employee.uploadUserHeadImg(formdata).then((res) => {
+          const { data, message } = res.data;
+          if (!data) {
             this.$message({ message: message, type: 'error' });
             return;
           } else {
             this.dialogObject.updateVisible = false;
-            this.$message({ message: '上传成功！', type: 'success' });
+            this.$message({ message, type: 'success' });
             this.loadData();
           }
         });
@@ -459,10 +488,9 @@ export default {
     },
     //打开修改弹窗
     openUpdateDiolog(row) {
-      this.userForm.areadata = '';
       this.userForm = { ...row };
-      if (this.userForm.roleIdStr !== null) {
-        this.roleIds = this.userForm.roleIdStr.split('、');
+      if (this.userForm.roleIds) {
+        this.roleIds = this.userForm.roleIds.split('、');
       } else {
         this.roleIds = [];
       }
@@ -470,23 +498,19 @@ export default {
     },
     //修改用户数据
     updateUserInfo() {
-      let areadata = '';
-      if (this.userForm.areadata != undefined) {
-        areadata = this.userForm.areadata;
-      }
       const user = {
-        userId: this.userForm.userId,
+        employeeId: this.userForm.employeeId,
         roleIds: this.roleIds,
         phone: this.userForm.phone,
-        address: areadata + this.userForm.address,
+        address: this.userForm.address,
         sex: this.userForm.sex,
-        name: this.userForm.name,
+        employeeName: this.userForm.employeeName,
         departmentId: this.userForm.departmentId,
       };
       this.$api.employee.updateUser(user).then((res) => {
-        const { data, success, message } = res.data;
-        if (!success) {
-          this.$message({ message: '修改失败！', type: 'error' });
+        const { data, message } = res.data;
+        if (!data) {
+          this.$message({ message, type: 'error' });
         } else {
           this.$message({ message: '修改成功！', type: 'success' });
           this.dialogObject.updateVisible = false;
@@ -496,12 +520,12 @@ export default {
     },
     //修改用户状态
     updateUserState(row) {
-      this.$api.employee.updateUserState(row.userId, row.state).then((res) => {
-        const { data, success, message } = res.data;
-        if (!success) {
-          this.$message({ message: '修改失败！', type: 'error' });
+      this.$api.employee.updateUserState(row.employeeId, row.status).then((res) => {
+        const { data, message } = res.data;
+        if (!data) {
+          this.$message({ message, type: 'error' });
         } else {
-          if (row.state == 1) {
+          if (row.status == 1) {
             this.$message({ message: '开启成功！', type: 'success' });
           } else {
             this.$message({ message: '禁用成功！', type: 'success' });
@@ -510,6 +534,56 @@ export default {
         }
       });
     },
+    openuploadNoteDialog(row) {
+      this.dialogObject.uploadNoteVisible = true;
+      this.userForm = { ...row };
+    },
+    //上传简历
+    uploadUserNote(param) {
+      if (param.file.name.indexOf('docx') == -1 && param.file.name.indexOf('doc') == -1 && param.file.name.indexOf('pdf') == -1) {
+        this.$notify.warning({
+          title: '警告',
+          message: '请上传格式为.docx .doc .pdf 的文件',
+        });
+      } else if (param.file.size / 1024 / 1024 / 2 > 10) {
+        this.$notify.warning({
+          title: '警告',
+          message: '文件大小必须小于10M',
+        });
+      } else {
+        //创建FormData对象(键值对集合) 将模型存在FormData中
+        const formdata = new FormData();
+        formdata.append('file', param.file);
+        formdata.append('employeeId', this.userForm.employeeId);
+        this.$api.employee.uploadUserNote(formdata).then((res) => {
+          const { data, message } = res.data;
+          if (!data) {
+            this.$message({ message: message, type: 'error' });
+            return;
+          } else {
+            this.dialogObject.updateVisible = false;
+            this.$message({ message, type: 'success' });
+            this.loadData();
+          }
+        });
+      }
+    },
+    //在线预览简历
+    notePreview(row) {
+      this.dialogObject.notepreviewVisible = true;
+      this.noteSrc = row.noteSrcUrl;
+      if (this.noteSrc.indexOf('pdf')) {
+        let loadingTask = pdf.createLoadingTask(row.noteSrcUrl);
+        loadingTask.promise
+          .then((pdf) => {
+            this.numPages = pdf.numPages;
+          })
+          .catch((err) => {
+            console.error('pdf 加载失败', err);
+          });
+      }
+    },
+    //#region
     // //地址框选择触发
     // handleChange(value) {
     //   this.search.province = '';
@@ -543,11 +617,12 @@ export default {
     //   this.userForm.areadata = '';
     //   this.userForm.areadata = this.search.province + this.search.city + this.search.district;
     // },
+    //#endregion
   },
   created() {
     this.loadData();
-    // this.getRoleList();
-    // this.getDepartmentList();
+    this.getRoleList();
+    this.getDepartmentList();
   },
 };
 </script>

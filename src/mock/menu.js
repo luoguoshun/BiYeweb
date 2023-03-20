@@ -9,11 +9,11 @@ export default {
           path: "/",
           name: "home",
           label: "首页",
-          icon: "s-home",
+          icon: "el-icon-s-home",
         },
         {
           label: "系统管理",
-          icon: "location",
+          icon: "el-icon-setting",
           children: [
             {
               path: "/system/user",
@@ -25,6 +25,42 @@ export default {
               path: "/system/role",
               name: "role",
               label: "角色管理",
+              icon: "setting",
+            },
+            {
+              path: "/system/department",
+              name: "department",
+              label: "部门管理",
+              icon: "setting",
+            },
+          ],
+        },
+        {
+          path: "/workAttendance",
+          name: "workAttendance",
+          label: "考勤管理",
+          icon: "el-icon-s-operation",
+        },
+        {
+          path: "/examine",
+          name: "examine",
+          label: "考核管理",
+          icon: "el-icon-s-operation",
+        },
+        {
+          label: "日志管理",
+          icon: "el-icon-time",
+          children: [
+            {
+              path: "/logs/systemLog",
+              name: "systemLog",
+              label: "系统日志",
+              icon: "setting",
+            },
+            {
+              path: "/logs/operateLog",
+              name: "operateLog",
+              label: "操作日志",
               icon: "setting",
             },
           ],
