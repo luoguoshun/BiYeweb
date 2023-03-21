@@ -12,6 +12,7 @@
     "core-js": "^3.8.3",
     "crypto-js": "^4.1.1",
     "docx-preview": "^0.1.13",
+    "echarts": "^5.2.2",
     "element-ui": "^2.15.13",
     "moment": "^2.29.4",
     "save": "^2.9.0",

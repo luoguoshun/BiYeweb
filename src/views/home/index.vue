@@ -31,17 +31,23 @@
           </div>
         </el-card>
       </div>
-      <el-card shadow="hover" style="height: 280px"> </el-card>
+      <el-card shadow="hover" style="height: 350px;">
+        <div id="otnerCountStatistics" :style="{ width: '550px', height: '300px' }"></div>
+      </el-card>
       <div class="graph">
-        <el-card shadow="hover" style="height: 260px"> </el-card>
-        <el-card shadow="hover" style="height: 260px"> </el-card>
+        <el-card shadow="hover">
+          <div id="deptCountStatistics" :style="{ height: '300px' }"></div>
+        </el-card>
+        <el-card shadow="hover"> </el-card>
       </div>
     </el-col>
   </el-row>
 </template>
 
 <script>
-import {mapGetters  } from "vuex";
+import { mapGetters } from 'vuex';
+var wHMaterialStatistics; //全局变量:仓库物资统计
+import * as echarts from 'echarts';
 export default {
   data() {
     return {
@@ -93,8 +99,8 @@ export default {
       },
     };
   },
-  computed:{
-    ...mapGetters({ userInfo: 'userInfo/getUserInfo' })
+  computed: {
+    ...mapGetters({ userInfo: 'userInfo/getUserInfo' }),
   },
   methods: {
     gethomeData() {
@@ -103,9 +109,175 @@ export default {
         this.tableData = res.data.tableData;
       });
     },
+    //初始化 仓库物资 成本统计
+    initWHStatistics() {
+      var chartDom1 = document.getElementById('wHmaterialStatistics');
+      wHMaterialStatistics = echarts.init(chartDom1);
+      var chartDom2 = document.getElementById('wHCostStatistics');
+      wHCostStatistics = echarts.init(chartDom2);
+      //#region
+      // this.$api.warehouse.warehouseStatistics().then((res) => {
+      //   const { data, success, message } = res.data;
+      //   if (!success) {
+      //     console.log(message);
+      //     return;
+      //   }
+      //   wHMaterialStatistics.setOption({
+      //     title: {
+      //       text: '仓库物资统计',
+      //       left: 'center',
+      //     },
+      //     tooltip: {
+      //       trigger: 'item',
+      //     },
+      //     legend: {
+      //       orient: 'vertical',
+      //       left: 'left',
+      //     },
+      //     series: [
+      //       {
+      //         name: 'Access From',
+      //         type: 'pie',
+      //         radius: '50%',
+      //         data: data.goodsCountStatistics,
+      //         emphasis: {
+      //           itemStyle: {
+      //             shadowBlur: 10,
+      //             shadowOffsetX: 0,
+      //             shadowColor: 'rgba(0, 0, 0, 0.5)',
+      //           },
+      //         },
+      //       },
+      //     ],
+      //   });
+      //   wHCostStatistics.setOption({
+      //     title: {
+      //       text: '仓库成本统计',
+      //       left: 'center',
+      //     },
+      //     tooltip: {
+      //       trigger: 'item',
+      //     },
+      //     legend: {
+      //       orient: 'vertical',
+      //       left: 'left',
+      //     },
+      //     series: [
+      //       {
+      //         name: 'Access From',
+      //         type: 'pie',
+      //         radius: '50%',
+      //         data: data.totalCostStatistics,
+      //         emphasis: {
+      //           itemStyle: {
+      //             shadowBlur: 10,
+      //             shadowOffsetX: 0,
+      //             shadowColor: 'rgba(0, 0, 0, 0.5)',
+      //           },
+      //         },
+      //       },
+      //     ],
+      //   });
+      // });
+      //#endregion
+    },
+    //初始化部门人数统计
+    initDeptCountStatistics() {
+      let chartDom = document.getElementById('deptCountStatistics');
+      let myChart = echarts.init(chartDom);
+      let option = {
+        title: {
+          text: 'Referer of a Website',
+          subtext: 'Fake Data',
+          left: 'center',
+        },
+        tooltip: {
+          trigger: 'item',
+        },
+        // legend: {
+        //   orient: 'vertical',
+        //   left: 'bottom',
+        // },
+        series: [
+          {
+            name: 'Access From',
+            type: 'pie',
+            radius: '50%',
+            data: [
+              { value: 1048, name: 'Search Engine' },
+              { value: 735, name: 'Direct' },
+              { value: 580, name: 'Email' },
+              { value: 484, name: 'Union Ads' },
+              { value: 300, name: 'Video Ads' },
+            ],
+            emphasis: {
+              itemStyle: {
+                shadowBlur: 10,
+                shadowOffsetX: 0,
+                shadowColor: 'rgba(0, 0, 0, 0.5)',
+              },
+            },
+          },
+        ],
+      };
+      option && myChart.setOption(option);
+    },
+    initotnerCountStatistics() {
+      let chartDom = document.getElementById('otnerCountStatistics');
+      let myChart = echarts.init(chartDom);
+      let option = {
+        title: {
+          text: 'Stacked Line',
+        },
+        tooltip: {
+          trigger: 'axis',
+        },
+        legend: {
+          data: ['Email', 'Union Ads'],
+        },
+        grid: {
+          left: '3%',
+          right: '4%',
+          bottom: '3%',
+          containLabel: true,
+        },
+        toolbox: {
+          feature: {
+            saveAsImage: {},
+          },
+        },
+        xAxis: {
+          type: 'category',
+          boundaryGap: false,
+          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        },
+        yAxis: {
+          type: 'value',
+        },
+        series: [
+          {
+            name: 'Email',
+            type: 'line',
+            stack: 'Total',
+            data: [120, 132, 101, 134, 90, 230, 210],
+          },
+          {
+            name: 'Union Ads',
+            type: 'line',
+            stack: 'Total',
+            data: [220, 182, 191, 234, 290, 330, 310],
+          }
+        ],
+      };
+      myChart.setOption(option);
+    },
   },
   created() {
     this.gethomeData();
+  },
+  mounted() {
+    this.initDeptCountStatistics();
+    this.initotnerCountStatistics();
   },
 };
 </script>
@@ -115,16 +287,17 @@ export default {
   .user {
     display: flex;
     align-items: center;
-    padding-bottom: 20px;
-    margin-bottom: 20px;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
     border-bottom: 1px solid #ccc;
+    // background: linear-gradient(135deg,#17ead9,#6078ea);
     img {
       width: 150px;
       height: 150px;
       border-radius: 50%;
       margin-right: 40px;
     }
-    &info {
+    .userinfo {
       .name {
         font-size: 32px;
         margin-bottom: 10px;
@@ -135,6 +308,8 @@ export default {
     }
   }
   .login-info {
+    background: linear-gradient(135deg, #17ead9, #6078ea);
+
     p {
       line-height: 28px;
       font-size: px;

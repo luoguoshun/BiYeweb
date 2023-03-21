@@ -1,11 +1,11 @@
 <template>
-  <header>
+  <div id="header">
     <div class="l-content">
       <el-button plain icon="el-icon-menu" size="mini" @click="collapseMenu"> </el-button>
       <!-- 面包屑 -->
       <el-breadcrumb separator="/" class="breadcrumb" separator-class="el-icon-arrow-right">
         <el-breadcrumb-item v-for="item in breadcrumbList" :key="item.path">
-          <span style="color: #ffffff; font-weight: normal"> {{ item.meta.title }}</span>
+          <span style="color: #1e2732; font-weight: normal"> {{ item.meta.title }}</span>
         </el-breadcrumb-item>
       </el-breadcrumb>
     </div>
@@ -21,7 +21,7 @@
         </el-dropdown-menu>
       </el-dropdown>
     </div>
-  </header>
+  </div>
 </template>
 
 <script>
@@ -49,7 +49,11 @@ export default {
      * @return {*}
      */
     logOut() {
-      this.clearUserInfo();
+      this.$store.commit('userInfo/clearUserInfo');
+      this.$store.commit('token/clearToken');
+      this.$store.commit('userInfo/clearUserInfo');
+
+      // this.clearUserInfo();
       this.closeAllTags();
       this.clearToken();
       this.$router.push({ name: 'login' });
@@ -70,34 +74,34 @@ export default {
 </script>
 
 <style lang="less" scoped>
-header {
+#header {
   display: flex;
-  height: 100%;
   align-items: center;
   justify-content: space-between;
-}
-.l-content {
-  display: flex;
-  align-items: center;
-  .el-breadcrumb {
-    margin-left: 10px;
+  color: red;
+  .l-content {
+    display: flex;
+    align-items: center;
+    .el-breadcrumb {
+      margin-left: 10px;
+    }
   }
-}
-.r-content {
-  display: flex;
-  flex-direction: row;
-  text-align: center;
-  justify-content: center;
-  > :first-child {
-    color: #ffffff;
-    margin-right: 10px;
-    // margin-bottom: 20px;
-    line-height: 40px;
-  }
-  .user {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
+  .r-content {
+    display: flex;
+    flex-direction: row;
+    text-align: center;
+    justify-content: center;
+    > :first-child {
+      margin-right: 10px;
+      line-height: 40px;
+      color: #1e2732;
+      font-weight: normal;
+    }
+    .user {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+    }
   }
 }
 </style>

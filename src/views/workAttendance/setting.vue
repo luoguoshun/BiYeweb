@@ -3,14 +3,36 @@
     <el-row>
       <el-col class="left" :span="6">
         <el-row>
-          <el-col :span="12"> 当前经度{{ center.lng }} </el-col>
-          <el-col :span="12"> 当前维度{{ center.lat }} </el-col>
-        </el-row>
-        <el-row>
-          <el-button size="small" :span="6" @click="SetLocation">设置为考勤地点</el-button>
+          <el-col :span="12"> 当前经度:{{ center.lng }} </el-col>
+          <el-col :span="12"> 当前维度:{{ center.lat }} </el-col>
+          <el-col :span="12"> 当前位置:{{ location }} </el-col>
+          <el-col :span="24">
+            <el-time-picker
+              v-model="value1"
+              :picker-options="{
+                selectableRange: '18:30:00 - 20:30:00',
+              }"
+              placeholder="上班考勤时间设置"
+            >
+            </el-time-picker>
+          </el-col>
+          <el-col :span="24">
+            <el-time-picker
+              arrow-control
+              v-model="value2"
+              :picker-options="{
+                selectableRange: '18:30:00 - 20:30:00',
+              }"
+              placeholder="下班考勤时间设置"
+            >
+            </el-time-picker>
+          </el-col>
+          <el-col :span="24">
+            <el-button size="small" :span="6" @click="SetLocation">点击设置</el-button>
+          </el-col>
         </el-row>
       </el-col>
-      <el-col class="right" :span="18">
+      <el-col class="right" :span="17">
         <el-row :gutter="20" class="serch">
           <el-col :span="6">
             <el-input size="medium" v-model="keyword" prefix-icon="el-icon-search" placeholder="请输入关键词" />
@@ -19,7 +41,6 @@
             <el-input size="medium" v-model="location" prefix-icon="el-icon-search" placeholder="请输入地区" />
           </el-col>
         </el-row>
-
         <!-- 属性说明 -->
         <!-- center：按照经纬度定位；scroll-wheel-zoom：允许滚动缩放； double-click-zoom：是否允许双击缩放-->
         <baidu-map
@@ -63,6 +84,8 @@ export default {
       zoom: 3, //缩放等级
       keyword: '',
       location: '',
+      value1: '',
+      value2: '',
     };
   },
   methods: {
@@ -140,6 +163,13 @@ export default {
 
 <style lang="less" scoped>
 #workAttendance {
+  .left {
+    // margin-left: 10px;
+    // border-right: 1px solid rgb(190, 178, 178);
+    .el-col {
+      margin-top: 10px;
+    }
+  }
   .right {
     .serch {
       margin-bottom: 10px;

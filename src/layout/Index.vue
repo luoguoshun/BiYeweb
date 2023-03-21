@@ -9,7 +9,7 @@
     <el-container>
       <!--header部分-->
       <el-header>
-        <common-header></common-header>
+        <common-header class="CommonHeader"></common-header>
       </el-header>
       <el-main>
         <Content></Content>
@@ -34,7 +34,10 @@ export default {
 
 <style lang="less" scoped>
 .el-header {
-  background-color: #333;
+  background-color: #ffffff;
+  // background: linear-gradient(135deg,#5efce8,#736efe);渐变色（渐变色在CSS中被定义成了 image 类型）
+  padding: 8px;
+  border-bottom: 1px solid #dfe4ea;
 }
 .el-main {
   padding-top: 5px;
