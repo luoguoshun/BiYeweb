@@ -5,12 +5,12 @@
       <!-- 面包屑 -->
       <el-breadcrumb separator="/" class="breadcrumb" separator-class="el-icon-arrow-right">
         <el-breadcrumb-item v-for="item in breadcrumbList" :key="item.path">
-          <span> {{ item.meta.title }}</span>
+          <span style="color: #ffffff; font-weight: normal"> {{ item.meta.title }}</span>
         </el-breadcrumb-item>
       </el-breadcrumb>
     </div>
     <div class="r-content">
-      <span>[{{userInfo.employeeName}}]</span>
+      <span>[{{ userInfo.employeeName }}]</span>
       <el-dropdown trigger="click" size="mini">
         <span class="el-dropdown-link">
           <img :src="userInfo.headerImgUrl" class="user" />
@@ -31,38 +31,34 @@ export default {
   data() {
     return {
       // userImg: require('../assets/images/user.png'),
-     
       breadcrumbList: [],
-    }
+    };
   },
-  computed:{
-    ...mapGetters({ userInfo: 'userInfo/getUserInfo' })
-    // userImg:()=>
+  computed: {
+    ...mapGetters({ userInfo: 'userInfo/getUserInfo' }),
   },
   methods: {
     ...mapMutations({
       clearUserInfo: 'userInfo/clearUserInfo',
       clearToken: 'token/clearToken',
       closeAllTags: 'lable/closeAllTags',
-      collapseMenu: 'tab/collapseMenu',//控制左侧菜单是否折叠
+      collapseMenu: 'tab/collapseMenu', //控制左侧菜单是否折叠
     }),
     /**
      * @description: 退出登陆
      * @return {*}
-     */    
+     */
     logOut() {
       this.clearUserInfo();
       this.closeAllTags();
       this.clearToken();
-      // if (this.$signalR.connection['_connectionState'] !== 'Disconnected') {
-      //   this.$signalR.connection.stop();
-      // }
       this.$router.push({ name: 'login' });
     },
   },
   created() {
     //获取路由内的全部信息
     this.breadcrumbList = this.$route.matched.filter((item, index) => index != 0);
+    console.log(store);
   },
   watch: {
     //监听，实时获取路由变动信息
@@ -80,7 +76,6 @@ header {
   align-items: center;
   justify-content: space-between;
 }
-
 .l-content {
   display: flex;
   align-items: center;
@@ -88,13 +83,12 @@ header {
     margin-left: 10px;
   }
 }
-
 .r-content {
   display: flex;
   flex-direction: row;
   text-align: center;
   justify-content: center;
-  >:first-child{
+  > :first-child {
     color: #ffffff;
     margin-right: 10px;
     // margin-bottom: 20px;
@@ -104,22 +98,6 @@ header {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-  }
-}
-</style>
-
-<style lang="less">
-.el-breadcrumb__item {
-  .el-breadcrumb__inner {
-    color: #666666;
-    font-weight: normal;
-  }
-
-  &:last-child {
-    .el-breadcrumb__inner {
-      color: #ffffff;
-  
-    }
   }
 }
 </style>

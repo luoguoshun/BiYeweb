@@ -7,6 +7,11 @@
 <script>
 export default {
   name: 'App',
+  created() {
+    // if (this.$signalR.connection['_connectionState'] !== 'Disconnected') {
+    //   this.$signalR.connection.stop();
+    // }
+  },
 };
 </script>
 

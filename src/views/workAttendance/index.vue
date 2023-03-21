@@ -1,6 +1,10 @@
+<!--
+ * @LastEditTime: 2023-03-21 09:02:01
+ * @Descripttion: 
+-->
 <template>
   <div id="">
-    <el-tabs v-model="activeName" @tab-click="handleClick">
+    <el-tabs v-model="activeName">
       <el-tab-pane label="考勤列表" name="list">
         <WAList></WAList>
       </el-tab-pane>
@@ -18,6 +22,11 @@ export default {
   components: {
     setting,
     WAList,
+  },
+  data() {
+    return {
+      activeName: 'list',
+    };
   },
 };
 </script>
