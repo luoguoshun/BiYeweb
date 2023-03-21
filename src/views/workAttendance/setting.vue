@@ -105,6 +105,7 @@ export default {
      * @param {*} point 坐标(经纬度)
      */
     dblclickMap({ type, target, pixel, point }) {
+      console.log('🚀 ~ file: setting.vue:108 ~ dblclickMap ~ target:', target);
       this.center.lng = point.lng;
       this.center.lat = point.lat;
     },
@@ -138,12 +139,26 @@ export default {
      * @description: 设置考勤位置
      */
     SetLocation() {
-      const content = {
-        lng: 0,
-        lat: 0,
-        location: '',
-      };
-      this.$api.dictionary.updateByName('考勤地点', content).then((res) => {
+      if (this.location || this.location == '') {
+        this.$message({ message: '请选择考勤地点', type: 'warning' });
+        return;
+      }
+      if (this.value1 || this.value1 == '') {
+        this.$message({ message: '请设置上班考勤时间', type: 'warning' });
+        return;
+      }
+      if (this.value2 || this.value2 == '') {
+        this.$message({ message: '请设置下班考勤时间', type: 'warning' });
+        return;
+      }
+      const keyArray = [
+        { name: '考勤地点', content: this.location },
+        { name: '上班时间', content: this.value1 },
+        { name: '下班时间', content: this.value2 },
+        { name: '考勤位置经度', content: this.center.lng },
+        { name: '考勤位置纬度', content: this.center.lat },
+      ];
+      this.$api.dictionary.updateByName(keyArray).then((res) => {
         let { data, success, message } = res.data;
         if (!data) {
           console.log(message);
@@ -157,6 +172,20 @@ export default {
   },
   created() {
     this.getCurrentPosition();
+    // var map = new BMapGL.Map('allmap');
+    // var point = new BMapGL.Point(116.331398, 39.897445);
+    // map.centerAndZoom(point, 12);
+    // var geolocation = new BMapGL.Geolocation();
+    // geolocation.getCurrentPosition(function (r) {
+    //   if (this.getStatus() == BMAP_STATUS_SUCCESS) {
+    //     var mk = new BMapGL.Marker(r.point);
+    //     map.addOverlay(mk);
+    //     map.panTo(r.point);
+    //     alert('您的位置：' + r.point.lng + ',' + r.point.lat);
+    //   } else {
+    //     alert('failed' + this.getStatus());
+    //   }
+    // });
   },
 };
 </script>

@@ -1,5 +1,5 @@
 /*
- * @LastEditTime: 2023-03-21 10:52:03
+ * @LastEditTime: 2023-03-21 16:10:17
  * @Descripttion: 数据字典接口
  */
 import axios from '../utils/axios';
@@ -14,9 +14,9 @@ export default {
    * @param {*} ids
    */
   deleteByIds(ids) {
-    return axios.get(`/api/Background/Dictionary/GetDictionaryList?ids${ids}`);
+    return axios.get(`/api/Background/Dictionary/DeleteByIds?ids${ids}`);
   },
-  updateByName(keyArr) {
-    return axios.get(`/api/Background/Dictionary/UpdateByName`,keyArr);
+  UpdateDicsByName(keyArr) {
+    return axios.get(`/api/Background/Dictionary/UpdateDicsByName?dtos${keyArr}`);
   },
 };

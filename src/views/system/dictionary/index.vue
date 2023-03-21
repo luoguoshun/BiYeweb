@@ -4,20 +4,17 @@
     <div class="editbar">
       <div class="edit_btn">
         <el-button type="primary" size="mini" class="el-icon-folder-add" @click="openCreateDialog()">添加 </el-button>
-        <el-button type="danger" size="mini" class="el-icon-delete" @click="deleteRoleIdById()"> 移除 </el-button>
-        <el-upload class="upload" action="" :http-request="importRolesByExcel" :auto-upload="true" :limit="1" :show-file-list="false">
-          <el-button slot="trigger" size="mini" type="success"> 导入数据 </el-button>
-        </el-upload>
-        <el-button slot="trigger" size="mini" type="warning" @click="exportRoleDataToExcel()"> 导出数据 </el-button>
+        <el-button type="danger" size="mini" class="el-icon-delete" @click="deleteDicById()"> 移除 </el-button>
       </div>
     </div>
     <!-- 表格 -->
-    <el-table :data="table.roleList" :header-cell-style="{ 'text-align': 'center' }" @selection-change="selectRows" border="">
+    <el-table :data="table.dictionaryList" :header-cell-style="{ 'text-align': 'center' }" @selection-change="selectRows" border="">
       <el-table-column type="selection" width="50" align="center"> </el-table-column>
-      <el-table-column prop="roleId" fixed label="角色编号" width="180" align="center"> </el-table-column>
-      <el-table-column prop="roleName" label="角色名" width="150" align="center"></el-table-column>
-      <el-table-column prop="description" label="角色描述" align="center"></el-table-column>
-      <el-table-column prop="state" label="状态" align="center">
+      <el-table-column prop="id" fixed label="编号" width="180" align="center"> </el-table-column>
+      <el-table-column prop="type" label="类型" width="150" align="center"></el-table-column>
+      <el-table-column prop="name" label="字典名称" align="center"></el-table-column>
+      <el-table-column prop="content" label="内容" align="center">
+        <el-table-column prop="remark" label="备注" align="center"></el-table-column>
         <template slot-scope="scope">
           <el-switch
             class="switch"
@@ -25,7 +22,7 @@
             :active-value="1"
             active-color="rgb(0, 255, 149)"
             inactive-color="rgb(151, 148, 148)"
-            v-model="scope.row.state"
+            v-model="scope.row.Status"
             @change="updateState(scope.row)"
           />
         </template>
@@ -38,26 +35,6 @@
         </template>
       </el-table-column>
     </el-table>
-
-    <!-- 修改角色信息对话框 -->
-    <el-dialog title="角色信息" center :visible.sync="dialogObject.updateVisible" :close-on-click-modal="false" width="40%">
-      <el-form ref="updateform" :model="roleForm" label-width="80px">
-        <el-form-item label="角色Id">
-          <el-input v-model="roleForm.roleId" disabled></el-input>
-        </el-form-item>
-        <el-form-item label="角色名称">
-          <el-input v-model="roleForm.roleName"></el-input>
-        </el-form-item>
-        <el-form-item label="角色描述">
-          <el-input type="textarea" :rows="6" v-model="roleForm.description" hidden="50px"></el-input>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogObject.updateVisible = false">取 消</el-button>
-        <el-button type="success" @click="updateRole()">修 改</el-button>
-      </div>
-    </el-dialog>
-
     <!-- 添加角色信息对话框 -->
     <el-dialog title="角色信息" center :visible.sync="dialogObject.createVisible" :close-on-click-modal="false" width="40%">
       <el-form ref="createform" :model="roleForm" label-width="80px">
@@ -89,31 +66,21 @@ export default {
         roleName: '',
         description: '',
       },
+      queryForm: {
+        conditions: '',
+        page: 1,
+        rows: 100,
+      },
       table: {
-        roleList: [],
+        dictionaryList: [],
         total: 0,
       },
       dialogObject: {
-        updateVisible: false,
         createVisible: false,
-        allocationDiolog: false,
       },
-      roleIds: [],
-      //权限数组
-      permissionData: [],
+      dicIds: [],
       routerIds: [],
-      //原角色权限
-      defaultCheckedKeys: [],
-      defaultProps: {
-        children: 'children',
-        label: 'label',
-      },
     };
-  },
-  computed: {
-    roleList() {
-      return this.roleForm.roleroleNames.split('、');
-    },
   },
   methods: {
     //修改用户状态
@@ -132,67 +99,21 @@ export default {
       //   }
       // });
     },
-    //导入数据
-    importRolesByExcel(param) {
-      if (param.file.type != 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
-        this.$notify.warning({
-          title: '警告',
-          message: '请上传格式为.xlsx 的文件',
-        });
-      } else {
-        const formdata = new FormData();
-        formdata.append('file', param.file);
-        formdata.append('tableId', 'Role');
-        this.$api.role.importRolesByExcel(formdata).then((res) => {
-          const { data, success, message } = res.data;
-          if (!success) {
-            this.$message({ message: message, type: 'error' });
-          } else {
-            this.$message({ message: message, type: 'success' });
-            this.loadData();
-          }
-        });
-      }
-    },
-    //导出数据到Excel
-    exportRoleDataToExcel() {
-      if (this.roleIds.length == 0) {
-        this.$message({ message: '请选择要导出的数据', type: 'info' });
-      } else {
-        this.$api.role.exportRoleDataToExcel(this.roleIds).then((res) => {
-          const { data, success, message } = res.data;
-          if (data == '') {
-            this.$message({ message: message, type: 'error' });
-          } else {
-            window.open(baseUrl + data, '_self');
-          }
-        });
-      }
-    },
     loadData() {
       this.getRoleList();
     },
     //获取角色数据
-    async getRoleList() {
-      await this.$api.role.getRoleList().then((res) => {
-        const { data, success, message } = res.data;
-        if (!success) {
+    async getDictionaryList() {
+      await this.$api.dictionary.getDictionaryList(this.queryForm).then((res) => {
+        const { data, count, message } = res.data;
+        if (!data) {
           console.log(message);
           return;
+        } else {
+          this.table.dictionaryList = data;
+          this.table.total = count;
         }
-        this.table.roleList = data;
       });
-    },
-    //获取路由树数据
-    constructRouteTreeData() {
-      // this.$api.vueRouter.constructRouteTreeData().then((res) => {
-      //   const { data, success, message } = res.data;
-      //   if (!success) {
-      //     console.log(message);
-      //     return;
-      //   }
-      //   this.permissionData = data;
-      // });
     },
     //打开添加弹窗弹窗
     openCreateDialog() {
@@ -247,26 +168,24 @@ export default {
     },
     //获取选中行的数据
     selectRows(selection) {
-      console.log(selection);
-      this.roleIds = [];
+      this.dicIds = [];
       selection.forEach((element) => {
-        this.roleIds.push(element.roleId);
+        this.dicIds.push(element.id);
       });
-      console.log(this.roleIds);
     },
-    //删除角色
-    deleteRoleIdById() {
-      if (this.roleIds.length == 0) {
+    //删除字典
+    deleteDicById() {
+      if (this.dicIds.length == 0) {
         this.$message({
           message: '请选择要删除的数据',
           type: 'warning',
         });
       } else {
-        this.$api.role.deleteRoleIdById(this.roleIds).then((res) => {
+        this.$api.dictionary.deleteByIds(this.dicIds).then((res) => {
           let { success, message } = res.data;
           if (!success) {
             console.log(message);
-            this.$message.error('删除失败！');
+            this.$message.error(message);
           } else {
             this.$message({ message: '删除成功！', type: 'success' });
             this.loadData();
@@ -274,58 +193,9 @@ export default {
         });
       }
     },
-    openAllocationDiolog(row) {
-      this.dialogObject.allocationDiolog = true;
-      this.roleForm.roleId = row.roleId;
-      this.roleForm.roleName = row.roleName;
-      this.$api.role.getAllPermissionsByRoleId(row['roleId']).then((res) => {
-        console.log(res.data);
-        this.$refs.routerTree.setCheckedKeys([]);
-        const { data, success, message } = res.data;
-        //清空选中节点
-        if (success) {
-          console.log(data);
-          //设置默认选中节点
-          this.defaultCheckedKeys = data;
-        }
-      });
-    },
-    //节点选中状态发生变化时的回调
-    handleCheckChange(data, checked, indeterminate) {
-      //获取所有选中的节点 getCheckedNodes()
-      // 接收两个 boolean 类型的参数，1. 是否只是叶子节点，默认值为 false 2. 是否包含半选节点，默认值为 false
-      let res = this.$refs.routerTree.getCheckedNodes(false, true); //子节点+父节点
-      this.routerIds = ['index'];
-      res.forEach((item) => {
-        this.routerIds.push(item.id);
-      });
-      console.log(this.routerIds);
-    },
-    //分配权限
-    assignPermissions() {
-      //未选中数组，且角色为分配任何权限
-      if (this.routerIds.length == 0 && this.defaultCheckedKeys.length == 0) {
-        this.$message({ message: ' 未选中数据', type: 'warning' });
-        return false;
-      } else if (this.routerIds.toString() == this.defaultCheckedKeys.toString()) {
-        this.$message({ message: ' 未修改数据', type: 'warning' });
-        return false;
-      }
-      this.$api.role.assignPermissions(this.roleForm.roleId, this.routerIds).then((res) => {
-        const { data, success, message } = res.data;
-        if (!success) {
-          this.$message({ message: '分配失败！', type: 'error' });
-        } else {
-          this.$message({ message: '分配成功！', type: 'success' });
-          this.dialogObject.allocationDiolog = false;
-          this.$refs.routerTree.setCheckedKeys([]);
-        }
-      });
-    },
   },
   created() {
     this.loadData();
-    this.constructRouteTreeData();
   },
 };
 </script>

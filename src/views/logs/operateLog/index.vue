@@ -161,7 +161,6 @@ export default {
             console.log(message);
             return;
           } else {
-            console.log(res.data);
             this.table.logData = data;
             this.table.total = count;
           }
