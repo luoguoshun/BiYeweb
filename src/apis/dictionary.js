@@ -1,5 +1,5 @@
 /*
- * @LastEditTime: 2023-03-22 14:35:06
+ * @LastEditTime: 2023-03-22 18:40:28
  * @Descripttion: 数据字典接口
  */
 import axios from '../utils/axios';
