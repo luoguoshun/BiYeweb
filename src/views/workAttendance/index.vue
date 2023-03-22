@@ -1,10 +1,26 @@
 <template>
   <div class="wa-container">
-    <el-row class="editbar">
-      <el-col :span="18">
+    <el-row class="editbar" :gutter="20">
+      <el-col :span="9">
         <el-button type="primary" size="mini" class="el-icon-folder-add" @click="handleOpenDialog('add', {})">补入 </el-button>
         <el-button type="danger" size="mini" class="el-icon-delete" @click="deleteDicById()"> 移除 </el-button>
         <el-button type="success" size="mini" class="el-icon-s-tools" @click="handleOpenSettingDialog()"> 设置 </el-button>
+      </el-col>
+      <el-col :span="5"> 
+        <el-date-picker v-model="queryForm.publicationDates" type="daterange" start-placeholder="开始日期" end-placeholder="结束日期" size="mini">
+        </el-date-picker>
+      </el-col>
+      <el-col :span="2">
+        <el-select size="mini" v-model="queryForm.roleId" placeholder="考勤类别">
+          <el-option label="上班" :value="1"></el-option>
+          <el-option label="下班" :value="2"></el-option>
+        </el-select>
+      </el-col>
+      <el-col :span="2">
+        <el-select size="mini" v-model="queryForm.roleId" placeholder="考勤方式">
+          <el-option label="打卡" :value="1"></el-option>
+          <el-option label="补入" :value="2"></el-option>
+        </el-select>
       </el-col>
       <el-col :span="4">
         <el-input v-model="queryForm.conditions" size="mini" label-width="80px" placeholder="请输入关键字"></el-input>
@@ -298,7 +314,7 @@ export default {
   width: 100%;
   height: 100%;
   .editbar {
-    margin: 5px 0px;
+   margin-bottom: 10px;
   }
 }
 </style>

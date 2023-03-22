@@ -250,8 +250,7 @@ export default {
   height: 100%;
   .editbar {
     width: 100%;
-    margin: 5px 0px;
-    padding: 2px 0px;
+    margin-bottom: 10px;
     display: grid;
     grid-template-columns: 1fr 1fr;
     .edit_btn {
