@@ -78,8 +78,10 @@ import {
   MessageBox,
   Message,
   Notification,
+  Empty
 } from 'element-ui';
 
+Vue.use(Empty);
 Vue.use(Pagination);
 Vue.use(Dialog);
 Vue.use(Autocomplete);

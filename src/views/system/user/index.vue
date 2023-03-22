@@ -394,7 +394,6 @@ export default {
       selection.forEach((element) => {
         this.userIds.push(element.employeeId);
       });
-      console.log(this.userIds);
     },
     //删除用户
     deleteUsers() {

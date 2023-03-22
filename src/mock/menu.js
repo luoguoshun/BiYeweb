@@ -1,3 +1,7 @@
+/*
+ * @LastEditTime: 2023-03-22 14:15:28
+ * @Descripttion: 
+ */
 import Mock from 'mockjs';
 export default {
   getMenuList: () => {
@@ -34,8 +38,8 @@ export default {
               icon: 'el-icon-menu',
             },
             {
-              path: '/system/dictioanary',
-              name: 'dictioanary',
+              path: '/system/dictionary',
+              name: 'dictionary',
               label: '字典管理',
               icon: 'el-icon-notebook-1',
             },

@@ -112,7 +112,7 @@ const routes = [
             component: () => import(`@/views/system/dictionary/index`),
             meta: {
               title: '字典管理',
-              isAuth: isAuth,
+              isAuth: false,
               keepAlive: keepAlive,
             }
           }
