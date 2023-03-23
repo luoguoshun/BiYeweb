@@ -27,6 +27,14 @@ const codeMessage = {
   503: '服务不可用，服务器暂时过载或维护。',
   504: '网关超时。',
 };
+//#region axios请求方式有五种
+// 1、get：多用于获取数据，获取表格数据，获取页面显示数据。
+// 2、post：主要用于提交表单数据和上传文件。
+// 3、put：对数据全部进行更新，推送后端。
+// 4、patch：只对更改过的数据进行更新，推送后端。
+// 5、delete：删除数据，参数可以放在url上也可以和post一样放在请求体中。
+//#endregion
+
 //创建axios实例
 const ajax = new axios.create({
   withCredentials: false, //跨域请求是否允许携带cookie资源凭证

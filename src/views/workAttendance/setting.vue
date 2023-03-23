@@ -159,9 +159,8 @@ export default {
         { name: '考勤位置纬度', content: this.center.lat },
       ];
       this.$api.dictionary.updateByName(keyArray).then((res) => {
-        let { data, success, message } = res.data;
+        let { data, message } = res.data;
         if (!data) {
-          console.log(message);
           this.$message.error('设置失败！');
         } else {
           this.$message({ message: '设置成功！', type: 'success' });
@@ -172,20 +171,6 @@ export default {
   },
   created() {
     this.getCurrentPosition();
-    // var map = new BMapGL.Map('allmap');
-    // var point = new BMapGL.Point(116.331398, 39.897445);
-    // map.centerAndZoom(point, 12);
-    // var geolocation = new BMapGL.Geolocation();
-    // geolocation.getCurrentPosition(function (r) {
-    //   if (this.getStatus() == BMAP_STATUS_SUCCESS) {
-    //     var mk = new BMapGL.Marker(r.point);
-    //     map.addOverlay(mk);
-    //     map.panTo(r.point);
-    //     alert('您的位置：' + r.point.lng + ',' + r.point.lat);
-    //   } else {
-    //     alert('failed' + this.getStatus());
-    //   }
-    // });
   },
 };
 </script>

@@ -1,5 +1,5 @@
 <!--
- * @LastEditTime: 2023-03-21 09:05:11
+ * @LastEditTime: 2023-03-23 08:48:29
  * @Descripttion: 主内容区
 -->
 <template>
@@ -24,29 +24,31 @@ export default {
     return {};
   },
   methods: {
-    ...mapMutations({
-      delTagFromArray: 'lable/removeTabHandle',
-      setActiveRoute: 'lable/setActiveRoute',
-    }),
+    //#region mapMutator methods
+    // ...mapMutations({
+    //   removeTabHandle: 'lable/removeTab',
+    //   setActiveRoute: 'lable/setActiveRoute',
+    // }),
+    //#endregion
+
     /**
      * @description: 切换组件
      * @param {*} tab: 标签对象
-     * @return {*}
      */
     switchComponent(tab) {
       let routeName = tab.$vnode.data.key;
       if (this.$route.path !== routeName) {
-        this.setActiveRoute(routeName); //重新设置激活的tab
+        this.$store.commit('lable/setActiveRoute', routeName); //重新设置激活的tab
         this.$router.push({ name: routeName });
       }
     },
     /**
      * @description: 删除tag标签并跳转路由
      * @param {*} routeName:  要删除的tag携带的路由
-     * @return {*}
      */
     removeTabHandle(routeName) {
-      this.delTagFromArray(routeName);
+      this.$store.commit('lable/removeTab', routeName);
+      // this.delTagFromArray(routeName);
       if (routeName == this.$route.name) {
         this.$router.push({ name: this.getDynamicTags.activeRoute });
       }

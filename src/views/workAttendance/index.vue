@@ -2,22 +2,22 @@
   <div class="wa-container">
     <el-row class="editbar" :gutter="20">
       <el-col :span="9">
-        <el-button type="primary" size="mini" class="el-icon-folder-add" @click="handleOpenDialog('add', {})">补入 </el-button>
-        <el-button type="danger" size="mini" class="el-icon-delete" @click="deleteDicById()"> 移除 </el-button>
-        <el-button type="success" size="mini" class="el-icon-s-tools" @click="handleOpenSettingDialog()"> 设置 </el-button>
+        <el-button type="primary" size="mini" class="el-icon-folder-add" @click="handleOpenDialog()">补入 </el-button>
+        <el-button type="danger" size="mini" class="el-icon-delete" @click="deleteWorkById()"> 移除 </el-button>
+        <el-button type="success" size="mini" class="el-icon-s-tools" @click="setVisible = true"> 设置 </el-button>
       </el-col>
-      <el-col :span="5"> 
+      <el-col :span="5">
         <el-date-picker v-model="queryForm.publicationDates" type="daterange" start-placeholder="开始日期" end-placeholder="结束日期" size="mini">
         </el-date-picker>
       </el-col>
       <el-col :span="2">
-        <el-select size="mini" v-model="queryForm.roleId" placeholder="考勤类别">
+        <el-select size="mini" v-model="queryForm.wAType" placeholder="考勤类别">
           <el-option label="上班" :value="1"></el-option>
           <el-option label="下班" :value="2"></el-option>
         </el-select>
       </el-col>
       <el-col :span="2">
-        <el-select size="mini" v-model="queryForm.roleId" placeholder="考勤方式">
+        <el-select size="mini" v-model="queryForm.WAMethod" placeholder="考勤方式">
           <el-option label="打卡" :value="1"></el-option>
           <el-option label="补入" :value="2"></el-option>
         </el-select>
@@ -54,9 +54,9 @@
       <el-table-column prop="remark" label="备注" align="center"></el-table-column>
       <!-- 操作 -->
       <el-table-column fixed="right" label="编辑" width="200" align="center">
-        <template slot-scope="scope">
-          <el-button type="text" size="small" @click="handleOpenDialog('update', scope.row)" icon="el-icon-edit">详细信息</el-button>
-        </template>
+        <!-- <template slot-scope="scope">
+          <el-button type="text" size="small" @click="handleOpenDialog()" icon="el-icon-edit">详细信息</el-button>
+        </template> -->
       </el-table-column>
     </el-table>
     <!-- 分页 -->
@@ -75,15 +75,23 @@
     </div>
     <!-- 添加考勤信息对话框 -->
     <el-dialog title="考勤信息" center :visible.sync="editVisible" :close-on-click-modal="false" width="40%">
-      <el-form ref="createform" :model="workAttendanceForm" label-width="80px">
-        <el-form-item label="类型">
-          <el-input v-model="workAttendanceForm.type" required></el-input>
+      <el-form ref="createform" :model="workAttendance" label-width="80px">
+        <el-form-item label="员工" required>
+          <el-select v-model="workAttendance.employeeId" filterable placeholder="请选择">
+            <el-option v-for="item in userOptions" :key="item.employeeId" :label="item.employeeName" :value="item.employeeId"> </el-option>
+          </el-select>
         </el-form-item>
-        <el-form-item label="考勤名称" required>
-          <el-input v-model="workAttendanceForm.name"></el-input>
+        <el-form-item label="考勤类别" required>
+          <el-select v-model="workAttendance.wAType" placeholder="考勤类别">
+            <el-option label="上班" :value="1"></el-option>
+            <el-option label="下班" :value="2"></el-option>
+          </el-select>
         </el-form-item>
-        <el-form-item label="考勤内容" required>
-          <el-input type="textarea" :rows="6" v-model="workAttendanceForm.content" hidden="50px"></el-input>
+        <el-form-item label="补卡日期" required>
+          <el-date-picker v-model="workAttendance.createdTime" type="date" placeholder="选择日期"> </el-date-picker>
+        </el-form-item>
+        <el-form-item label="备注">
+          <el-input type="textarea" :rows="6" v-model="workAttendance.remark" hidden="50px"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -99,17 +107,20 @@
 
 <script>
 import setting from './setting.vue';
+import { checkField } from '@/utils/util';
 export default {
   components: {
     setting,
   },
   data() {
     return {
-      workAttendanceForm: {
-        id: 0,
-        type: '',
-        name: '',
-        content: '',
+      workAttendance: {
+        employeeId: '',
+        wAType: '',
+        remark: '',
+        wAMethod: '2',
+        wALocation: '',
+        createdTime: '',
       },
       queryForm: {
         wAType: '0',
@@ -126,9 +137,9 @@ export default {
             EmployeeId: 'luo',
             employeeName: 'luoguoshun',
             departmentName: '技术部门',
-            wAType: 1,
+            wAType: '1',
             wATypeStr: '下班',
-            wAMethod: 1,
+            wAMethod: '1',
             wAMethodStr: '打卡',
             wALocation: '广州市天河区',
             Longitude: 123.22,
@@ -143,13 +154,14 @@ export default {
       },
       editVisible: false,
       setVisible: false,
-      dicIds: [],
-      editType: '',
+      workAttendanceIds: [],
+      userOptions: [],
     };
   },
   methods: {
     loadData() {
       this.getworkAttendanceList();
+      this.getUserList();
     },
     /**
      * @description: 重置搜索条件
@@ -173,6 +185,15 @@ export default {
         }
       });
     },
+    //获取用户数据
+    async getUserList() {
+      await this.$api.employee.getUserList(1, 500, '', '').then((res) => {
+        const { data, count } = res.data;
+        if (data) {
+          this.userOptions = data;
+        }
+      });
+    },
     //条数改变
     handleSizeChange(row) {
       this.queryForm.row = row;
@@ -184,32 +205,33 @@ export default {
       this.loadData();
     },
     //打开添加弹窗弹窗
-    handleOpenDialog(type, row) {
-      if (type == 'add') {
-        this.editType = 'add';
-        this.workAttendanceForm.id = 0;
-        this.workAttendanceForm.type = '';
-        this.workAttendanceForm.name = '';
-        this.workAttendanceForm.content = '';
-      } else if (type == 'update') {
-        this.editType = 'update';
-        this.workAttendanceForm.id = row.id ?? 0;
-        this.workAttendanceForm.type = row.type ?? '';
-        this.workAttendanceForm.name = row.name ?? '';
-        this.workAttendanceForm.content = row.content ?? '';
-      } else {
-        return;
-      }
+    handleOpenDialog() {
+      this.workAttendance.id = 0;
+      this.workAttendance.type = '';
+      this.workAttendance.name = '';
+      this.workAttendance.content = '';
       this.editVisible = true; //打开添加弹窗
     },
     //添加考勤数据
     addworkAttendance() {
-      this.$api.workAttendance.addworkAttendance(this.workAttendanceForm).then((res) => {
-        const { data, resultType } = res.data;
+      if (!checkField(this.workAttendance.employeeId)) {
+        this.$message({ message: '请选择职工', type: 'warning' });
+        return;
+      }
+      if (!checkField(this.workAttendance.wAType)) {
+        this.$message({ message: '请选择补入类型', type: 'warning' });
+        return;
+      }
+      if (!checkField(this.workAttendance.createdTime)) {
+        this.$message({ message: '请选择补卡时间', type: 'warning' });
+        return;
+      }
+      this.$api.workAttendance.addWorkAttendance(this.workAttendance).then((res) => {
+        const { data, message,resultType } = res.data;
         if (!data) {
-          this.$message({ message: '添加失败！', type: 'error' });
+          this.$message({ message, type: 'error' });
         } else {
-          this.$message({ message: '添加成功！', type: 'success' });
+          this.$message({ message, type: 'success' });
           this.dialogObject.createVisible = false;
           this.loadData();
         }
@@ -217,7 +239,7 @@ export default {
     },
     //修改考勤数据
     updateDicsByName() {
-      this.$api.workAttendance.updateDicsByName([this.workAttendanceForm]).then((res) => {
+      this.$api.workAttendance.updateDicsByName([this.workAttendance]).then((res) => {
         console.log(res);
         const { data, resultType } = res.data;
         if (!data) {
@@ -230,43 +252,26 @@ export default {
       });
     },
     handleConfirm() {
-      if (this.workAttendanceForm.type == '') {
-        this.$message({ message: '请填写类型', type: 'info' });
-        return;
-      }
-      if (this.workAttendanceForm.name == '') {
-        this.$message({ message: '请填写考勤名称', type: 'info' });
-        return;
-      }
-      if (this.workAttendanceForm.content == '') {
-        this.$message({ message: '请填写考勤内容', type: 'info' });
-        return;
-      }
-      if (this.editType == 'add') {
-        this.addworkAttendance();
-      } else if (this.editType == 'update') {
-        this.updateDicsByName();
-      }
+      this.addworkAttendance();
     },
     //获取选中行的数据
     selectRows(selection) {
-      this.dicIds = [];
+      this.workAttendanceIds = [];
       selection.forEach((element) => {
-        this.dicIds.push(element.id);
+        this.workAttendanceIds.push(element.id);
       });
     },
     //删除考勤
-    deleteDicById() {
-      if (this.dicIds.length == 0) {
+    deleteWorkById() {
+      if (this.workAttendanceIds.length == 0) {
         this.$message({
           message: '请选择要删除的数据',
           type: 'warning',
         });
       } else {
-        this.$api.workAttendance.deleteByIds(this.dicIds).then((res) => {
-          let { success, message } = res.data;
-          if (!success) {
-            console.log(message);
+        this.$api.workAttendance.deleteWorkAttendances(this.workAttendanceIds).then((res) => {
+          let { data, message } = res.data;
+          if (!data) {
             this.$message.error(message);
           } else {
             this.$message({ message: '删除成功！', type: 'success' });
@@ -299,9 +304,6 @@ export default {
           };
       }
     },
-    handleOpenSettingDialog() {
-      this.setVisible = true;
-    },
   },
   created() {
     this.loadData();
@@ -314,7 +316,7 @@ export default {
   width: 100%;
   height: 100%;
   .editbar {
-   margin-bottom: 10px;
+    margin-bottom: 10px;
   }
 }
 </style>
