@@ -159,16 +159,20 @@ export default {
           id: '1',
           itemName: '纪律',
           examineLevel: '',
+          remark:'',
+
         },
         {
           id: '2',
           itemName: '工作量',
           examineLevel: '',
+          remark:'',
         },
         {
           id: '3',
           itemName: '出勤',
           examineLevel: '',
+          remark:'',
         },
       ],
     };
