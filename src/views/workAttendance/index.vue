@@ -55,7 +55,7 @@
       <!-- 操作 -->
       <el-table-column fixed="right" label="编辑" width="200" align="center">
         <!-- <template slot-scope="scope">
-          <el-button type="text" size="small" @click="handleOpenDialog()" icon="el-icon-edit">详细信息</el-button>
+          <el-button type="text" size="small" @click="handleOpenDialog(scope.row)" icon="el-icon-edit">考核详情</el-button>
         </template> -->
       </el-table-column>
     </el-table>
@@ -74,24 +74,24 @@
       </el-pagination>
     </div>
     <!-- 添加考勤信息对话框 -->
-    <el-dialog title="考勤信息" center :visible.sync="editVisible" :close-on-click-modal="false" width="40%">
+    <el-dialog title="考勤信息" center :visible.sync="editVisible" :close-on-click-modal="false" width="30%">
       <el-form ref="createform" :model="workAttendance" label-width="80px">
         <el-form-item label="员工" required>
-          <el-select v-model="workAttendance.employeeId" filterable placeholder="请选择">
+          <el-select v-model="workAttendance.employeeId" filterable placeholder="请选择" style="width: 300px;">
             <el-option v-for="item in userOptions" :key="item.employeeId" :label="item.employeeName" :value="item.employeeId"> </el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="考勤类别" required>
-          <el-select v-model="workAttendance.wAType" placeholder="考勤类别">
+          <el-select v-model="workAttendance.wAType" placeholder="考勤类别" style="width: 300px;">
             <el-option label="上班" :value="1"></el-option>
             <el-option label="下班" :value="2"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="补卡日期" required>
-          <el-date-picker v-model="workAttendance.createdTime" type="date" placeholder="选择日期"> </el-date-picker>
+        <el-form-item label="补卡日期" required >
+          <el-date-picker v-model="workAttendance.createdTime" type="date" placeholder="选择日期" value-format="yyyy-MM-dd" style="width: 300px;"> </el-date-picker>
         </el-form-item>
         <el-form-item label="备注">
-          <el-input type="textarea" :rows="6" v-model="workAttendance.remark" hidden="50px"></el-input>
+          <el-input type="textarea" :rows="6" v-model="workAttendance.remark" hidden="50px" :autosize="{ minRows: 2, maxRows: 6 }"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -123,8 +123,8 @@ export default {
         createdTime: '',
       },
       queryForm: {
-        wAType: '0',
-        WAMethod: '0',
+        wAType: '',
+        WAMethod: '',
         employeeId: '',
         publicationDates: [],
         page: 1,
@@ -169,6 +169,9 @@ export default {
     resetQueryForm() {
       this.queryForm.row = 10;
       this.queryForm.page = 1;
+      this.queryForm.WAMethod='';
+      this.queryForm.wAType='';
+      this.queryForm.publicationDates=[];
       this.queryForm.conditions = '';
       this.loadData();
     },
@@ -227,7 +230,7 @@ export default {
         return;
       }
       this.$api.workAttendance.addWorkAttendance(this.workAttendance).then((res) => {
-        const { data, message,resultType } = res.data;
+        const { data, message, resultType } = res.data;
         if (!data) {
           this.$message({ message, type: 'error' });
         } else {

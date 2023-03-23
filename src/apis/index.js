@@ -1,5 +1,5 @@
 /*
- * @LastEditTime: 2023-03-23 10:39:26
+ * @LastEditTime: 2023-03-23 17:05:19
  * @Descripttion: 统一接口导出文件
  */
 import login from './login';
@@ -11,6 +11,7 @@ import mock from './mock';
 import workAttendance from './workAttendance';
 import dictionary from './dictionary';
 import examineItem from './examineItem';
+import examine from './examine';
 export default {
   login,
   role,
@@ -20,5 +21,6 @@ export default {
   log,
   workAttendance,
   dictionary,
+  examine,
   examineItem
 };
