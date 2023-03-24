@@ -15,10 +15,37 @@
           <p>上次登录地点：<span>北京</span></p>
         </div>
       </el-card>
+      <!-- 系统通知 -->
       <el-card style="height: 460px; margin-top: 20px">
-        <el-table :data="tableData">
-          <el-table-column show-overflow-tooltip v-for="(val, key) in tableLabel" :key="key" :prop="key" :label="val"></el-table-column>
-        </el-table>
+        <el-tabs v-model="activeName" type="card">
+          <el-tab-pane label="系统通知" name="systemMessage">
+            <el-collapse v-model="activeSysMessageId" accordion>
+              <el-collapse-item v-for="item in systemMessageList" :key="item.messageId" :name="item.messageId">
+                <template slot="title">
+                  {{ item.title }}
+                </template>
+                <div class="collapseContent">{{ item.content }}</div>
+                <div>
+                  <el-button v-if="item.messageParameter" type="warning" size="mini" @click="processEvent(item.messageParameter)">详情 </el-button>
+                </div>
+              </el-collapse-item>
+            </el-collapse>
+          </el-tab-pane>
+          <el-tab-pane label="我的消息" name="second">
+            <el-collapse v-model="activeMyMessageId" @change="readMessage" accordion>
+              <el-collapse-item v-for="item in messageList" :key="item.messageId" :name="item.messageId">
+                <template slot="title">
+                  <i class="el-icon-chat-dot-round"></i>{{ item.title }}
+                  <el-badge v-if="item.messageState != 4" is-dot />
+                </template>
+                <div class="collapseContent">{{ item.content }}</div>
+                <div>
+                  <el-button v-if="item.messageParameter" type="warning" size="mini" @click="processEvent(item.messageParameter)">详情 </el-button>
+                </div>
+              </el-collapse-item>
+            </el-collapse>
+          </el-tab-pane>
+        </el-tabs>
       </el-card>
     </el-col>
     <el-col :span="16" style="margin-top: 20px">
@@ -31,7 +58,7 @@
           </div>
         </el-card>
       </div>
-      <el-card shadow="hover" style="height: 350px;">
+      <el-card shadow="hover" style="height: 350px">
         <div id="otnerCountStatistics" :style="{ width: '550px', height: '300px' }"></div>
       </el-card>
       <div class="graph">
@@ -46,7 +73,6 @@
 
 <script>
 import { mapGetters } from 'vuex';
-var wHMaterialStatistics; //全局变量:仓库物资统计
 import * as echarts from 'echarts';
 export default {
   data() {
@@ -97,6 +123,11 @@ export default {
         monthBuy: '本月购买',
         totalBuy: '总购买',
       },
+      messageList: [],
+      systemMessageList: [{ messageId: 'ME366666', title: '测试', content: 'hahah' }],
+      activeSysMessageId: '',
+      activeMyMessageId: '',
+      activeName: 'systemMessage',
     };
   },
   computed: {
@@ -108,78 +139,6 @@ export default {
         res = res.data;
         this.tableData = res.data.tableData;
       });
-    },
-    //初始化 仓库物资 成本统计
-    initWHStatistics() {
-      var chartDom1 = document.getElementById('wHmaterialStatistics');
-      wHMaterialStatistics = echarts.init(chartDom1);
-      var chartDom2 = document.getElementById('wHCostStatistics');
-      wHCostStatistics = echarts.init(chartDom2);
-      //#region
-      // this.$api.warehouse.warehouseStatistics().then((res) => {
-      //   const { data, success, message } = res.data;
-      //   if (!success) {
-      //     console.log(message);
-      //     return;
-      //   }
-      //   wHMaterialStatistics.setOption({
-      //     title: {
-      //       text: '仓库物资统计',
-      //       left: 'center',
-      //     },
-      //     tooltip: {
-      //       trigger: 'item',
-      //     },
-      //     legend: {
-      //       orient: 'vertical',
-      //       left: 'left',
-      //     },
-      //     series: [
-      //       {
-      //         name: 'Access From',
-      //         type: 'pie',
-      //         radius: '50%',
-      //         data: data.goodsCountStatistics,
-      //         emphasis: {
-      //           itemStyle: {
-      //             shadowBlur: 10,
-      //             shadowOffsetX: 0,
-      //             shadowColor: 'rgba(0, 0, 0, 0.5)',
-      //           },
-      //         },
-      //       },
-      //     ],
-      //   });
-      //   wHCostStatistics.setOption({
-      //     title: {
-      //       text: '仓库成本统计',
-      //       left: 'center',
-      //     },
-      //     tooltip: {
-      //       trigger: 'item',
-      //     },
-      //     legend: {
-      //       orient: 'vertical',
-      //       left: 'left',
-      //     },
-      //     series: [
-      //       {
-      //         name: 'Access From',
-      //         type: 'pie',
-      //         radius: '50%',
-      //         data: data.totalCostStatistics,
-      //         emphasis: {
-      //           itemStyle: {
-      //             shadowBlur: 10,
-      //             shadowOffsetX: 0,
-      //             shadowColor: 'rgba(0, 0, 0, 0.5)',
-      //           },
-      //         },
-      //       },
-      //     ],
-      //   });
-      // });
-      //#endregion
     },
     //初始化部门人数统计
     initDeptCountStatistics() {
@@ -266,10 +225,59 @@ export default {
             type: 'line',
             stack: 'Total',
             data: [220, 182, 191, 234, 290, 330, 310],
-          }
+          },
         ],
       };
       myChart.setOption(option);
+    },
+    //获取我的消息列表
+    async getMessageListByUserId() {
+      await this.$api.message.getMessageListByUserId().then((res) => {
+        const { data, success, message } = res.data;
+        if (!success) {
+          console.log(message);
+          return;
+        }
+        this.messageList = data;
+      });
+    },
+    //获取系统所有消息列表
+    async getSystemMessageList() {
+      await this.$api.message.getMessageList(1, 10, '', 3).then((res) => {
+        const { data, success, message } = res.data;
+        if (!success) {
+          return;
+        }
+        this.systemMessageList = data.message;
+      });
+    },
+    //点开面板 消息被读取
+    readMessage(messageId) {
+      //展开面板时触发
+      if (messageId == '') {
+        return;
+      }
+      //判断是否需要调取接口messageState == 4（已读）则不需要
+      for (let i = 0; i < this.messageList.length; i++) {
+        let message = this.messageList[i];
+        if (message.messageId == messageId && message.messageState == 4) {
+          return;
+        }
+      }
+      this.$api.message.readMessage(messageId).then((res) => {
+        const { data, success, message } = res.data;
+        if (!success) {
+          console.log(message);
+          return;
+        } else {
+          this.messageList.forEach((item) => {
+            if (item.messageId == messageId) {
+              item.messageState = 4;
+              return;
+            }
+          });
+        }
+      });
     },
   },
   created() {

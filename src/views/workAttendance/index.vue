@@ -31,7 +31,7 @@
     <!-- 表格 -->
     <el-table :data="table.workAttendanceList" :header-cell-style="{ 'text-align': 'center' }" @selection-change="selectRows" border="">
       <el-table-column type="selection" width="50" align="center"> </el-table-column>
-      <el-table-column prop="id" fixed label="编号" width="180" align="center"> </el-table-column>
+      <el-table-column prop="id" label="编号" align="center"> </el-table-column>
       <el-table-column prop="employeeName" label="考勤人" width="150" align="center"></el-table-column>
       <el-table-column prop="departmentName" label="部门" align="center"></el-table-column>
       <el-table-column prop="wATypeStr" label="上班/下班" align="center"></el-table-column>

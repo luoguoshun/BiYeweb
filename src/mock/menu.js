@@ -1,5 +1,5 @@
 /*
- * @LastEditTime: 2023-03-22 14:15:28
+ * @LastEditTime: 2023-03-24 15:59:04
  * @Descripttion: 
  */
 import Mock from 'mockjs';
@@ -74,6 +74,12 @@ export default {
               icon: 'el-icon-coin',
             },
           ],
+        },
+        {
+          path: '/message',
+          name: 'message',
+          label: '消息通知',
+          icon: 'el-icon-chat-dot-square',
         },
       ],
     };

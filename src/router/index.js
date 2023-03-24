@@ -62,7 +62,7 @@ const routes = [
         component: () => import(`@/views/home/index`),
         meta: {
           title: '首页',
-          isAuth: isAuth,
+          isAuth: false,
           keepAlive: keepAlive,
         },
       },
@@ -167,6 +167,17 @@ const routes = [
             },
           },
         ],
+      },
+       //消息通知
+       {
+        path: '/message',
+        name: 'message',
+        component: () => import(`@/views/message/index`),
+        meta: {
+          title: '首页',
+          isAuth: false,
+          keepAlive: keepAlive,
+        },
       },
     ],
   },

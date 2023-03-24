@@ -1,12 +1,11 @@
+/*
+ * @LastEditTime: 2023-03-24 15:21:12
+ * @Descripttion: signalR中心
+ */
 import * as signalR from '@microsoft/signalr';
 import store from '../store/index.js';
-import {
-  baseUrl
-} from '@/config/defaultString.js';
-import {
-  Message,
-  Notification,
-} from 'element-ui';
+import { baseUrl } from '@/config/defaultString.js';
+import { Message, Notification } from 'element-ui';
 let hubUrl = baseUrl + '/chatHub';
 //连接集线器
 let connection = new signalR.HubConnectionBuilder()
@@ -21,17 +20,17 @@ let connection = new signalR.HubConnectionBuilder()
 //注册方法 用于服务器向客户端调取
 connection.on('SendMessageToGroup', function (message) {
   console.log(message.Content);
-})
+});
 connection.on('SendPrivateMessage', function (message) {
   Notification.info({
     title: message.Title,
     message: message.Content,
-    position: 'bottom-right'
+    position: 'bottom-right',
   });
-})
+});
 connection.on('Abort', function (message) {
   Message.warning(message.Content);
-})
+});
 export default {
-  connection
+  connection,
 };

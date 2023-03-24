@@ -78,9 +78,14 @@ import {
   MessageBox,
   Message,
   Notification,
-  Empty
+  Empty,
+  Popconfirm,
+  Drawer,
+  Descriptions
 } from 'element-ui';
-
+Vue.use(Descriptions);
+Vue.use(Drawer);
+Vue.use(Popconfirm);
 Vue.use(Empty);
 Vue.use(Pagination);
 Vue.use(Dialog);

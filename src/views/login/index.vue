@@ -10,7 +10,6 @@
             <!-- 登录信息 -->
             <div class="login-info">
               <el-input placeholder="请输入账号" prefix-icon="el-icon-user-solid" style="width: 70%" v-model="loginInfo.account"> </el-input>
-
               <el-input placeholder="请输入密码" prefix-icon="el-icon-lock" show-password style="width: 70%" v-model="loginInfo.password"> </el-input>
               <el-button @click="login" class="btn">登 录 </el-button>
             </div>
@@ -48,7 +47,7 @@ export default {
               this.setTokenInfo(data);
               // this.setRouters(data.routers);
               this.setUserInfo(data.userInfo);
-              // this.connectionSignalR();
+              this.connectionSignalR();
               if (this.$route.query.redirectUrl) {
                 this.$router.replace(this.$route.query.redirectUrl); //跳转至进入登录页前的路由（重定向）
               } else {
