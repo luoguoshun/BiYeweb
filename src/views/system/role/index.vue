@@ -85,7 +85,7 @@
     </el-dialog>
 
     <!-- 添加角色信息对话框 -->
-    <el-dialog title="角色信息" center :visible.sync="dialogObject.createVisible" :close-on-click-modal="false" width="40%">
+    <el-dialog title="添加角色" center :visible.sync="dialogObject.createVisible" :close-on-click-modal="false" width="40%">
       <el-form ref="createform" :model="roleForm" label-width="80px">
         <el-form-item label="角色Id">
           <el-input v-model="roleForm.roleId"></el-input>
