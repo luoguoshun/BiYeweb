@@ -20,8 +20,9 @@ export default {
   getExamineDetailsList(queryform) {
     return axios.post('/api/Background/Examine/GetExamineDetailsList', queryform);
   },
-  addExamineAsync(examine) {
-    return axios.post('/api/Background/Examine/AddExamineAsync', examine);
+  addExamine(examine) {
+    console.log(examine);
+    return axios.post('/api/Background/Examine/AddExamine', examine);
   },
   getExamineById(id) {
     return axios.get(`/api/Background/Examine/GetExamineById?id=${id}`);

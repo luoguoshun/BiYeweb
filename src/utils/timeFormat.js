@@ -6,7 +6,7 @@ export const shortTime = function(value) {
 };
 
 // 长时间
-export const time = function(value) {
+export const longTime = function(value) {
   return moment(value).format('YYYY-MM-DD HH:mm:ss');
 };
 

@@ -1,34 +1,39 @@
 <template>
   <div id="workAttendance">
     <el-row>
-      <el-col class="left" :span="6">
+      <el-col class="left" :span="6"> 
+        <h3>        <el-tag type="warning">当前设置</el-tag>
+</h3>
         <el-row>
-          <el-col :span="12"> 当前经度:{{ center.lng }} </el-col>
-          <el-col :span="12"> 当前维度:{{ center.lat }} </el-col>
-          <el-col :span="12"> 当前位置:{{ location }} </el-col>
+          <el-col :span="24"> 经度:{{ center.lng }} </el-col>
+          <el-col :span="124"> 维度:{{ center.lat }} </el-col>
+          <el-col :span="24"> 位置:{{ address }} </el-col>
           <el-col :span="24">
-            <el-time-picker
-              v-model="value1"
-              :picker-options="{
-                selectableRange: '18:30:00 - 20:30:00',
-              }"
+            <el-time-select
               placeholder="上班考勤时间设置"
-            >
-            </el-time-picker>
-          </el-col>
-          <el-col :span="24">
-            <el-time-picker
-              arrow-control
-              v-model="value2"
+              v-model="shangbanTime"
               :picker-options="{
-                selectableRange: '18:30:00 - 20:30:00',
+                start: '08:00',
+                step: '00:15',
+                end: '20:00',
               }"
-              placeholder="下班考勤时间设置"
             >
-            </el-time-picker>
+            </el-time-select>
           </el-col>
           <el-col :span="24">
-            <el-button size="small" :span="6" @click="SetLocation">点击设置</el-button>
+            <el-time-select
+              placeholder="下班考勤时间设置"
+              v-model="xiabanTime"
+              :picker-options="{
+                start: '08:00',
+                step: '00:15',
+                end: '20:00',
+              }"
+            >
+            </el-time-select>
+          </el-col>
+          <el-col :span="24">
+            <el-button size="small" :span="6" @click="setLocation">应用</el-button>
           </el-col>
         </el-row>
       </el-col>
@@ -76,6 +81,8 @@
 <script>
 import axios from 'axios';
 import { serverAK } from '@/config/defaultString.js';
+import { checkField } from '@/utils/util';
+import { monthTime } from '@/utils/timeFormat';
 export default {
   computed: {},
   data() {
@@ -84,8 +91,10 @@ export default {
       zoom: 3, //缩放等级
       keyword: '',
       location: '',
-      value1: '',
-      value2: '',
+      address: '',
+      infoWindowShow: false,
+      shangbanTime: '',
+      xiabanTime: '',
     };
   },
   methods: {
@@ -106,8 +115,16 @@ export default {
      */
     dblclickMap({ type, target, pixel, point }) {
       console.log('🚀 ~ file: setting.vue:108 ~ dblclickMap ~ target:', target);
+      // this.location = target.dh;
       this.center.lng = point.lng;
       this.center.lat = point.lat;
+
+      const myGeo = new BMap.Geocoder(); // 创建地址解析器的实例
+      myGeo.getLocation(point, (rs) => {
+        let adr = rs.addressComponents;
+        this.address = adr.province + adr.city + adr.district + adr.street + adr.streetNumber; // 省市区街道门牌号
+        this.infoWindowShow = true;
+      });
     },
     /**
      * @description: 定位成功后触发此事件
@@ -117,6 +134,7 @@ export default {
      */
     locationSuccessHandle({ point, AddressComponent, marker }) {
       console.log('🚀 ~ file: index.vue:75 ~ locationSuccessHandle ~ marker:', marker);
+      console.log(AddressComponent);
       this.center.lng = point.lng;
       this.center.lat = point.lat;
     },
@@ -138,39 +156,78 @@ export default {
     /**
      * @description: 设置考勤位置
      */
-    SetLocation() {
-      if (this.location || this.location == '') {
+    setLocation() {
+      if (!this.address || this.address == '') {
         this.$message({ message: '请选择考勤地点', type: 'warning' });
         return;
       }
-      if (this.value1 || this.value1 == '') {
+      if (!this.shangbanTime || this.shangbanTime == '') {
         this.$message({ message: '请设置上班考勤时间', type: 'warning' });
         return;
       }
-      if (this.value2 || this.value2 == '') {
+      if (!this.xiabanTime || this.xiabanTime == '') {
         this.$message({ message: '请设置下班考勤时间', type: 'warning' });
         return;
       }
       const keyArray = [
-        { name: '考勤地点', content: this.location },
-        { name: '上班时间', content: this.value1 },
-        { name: '下班时间', content: this.value2 },
-        { name: '考勤位置经度', content: this.center.lng },
-        { name: '考勤位置纬度', content: this.center.lat },
+        { type: 'SystemSettings', name: '考勤地点', content: this.address },
+        { type: 'SystemSettings', name: '上班打卡时间', content: this.shangbanTime },
+        { type: 'SystemSettings', name: '下班打卡时间', content: this.xiabanTime },
+        { type: 'SystemSettings', name: '考勤位置经度', content: this.center.lng.toString() },
+        { type: 'SystemSettings', name: '考勤位置纬度', content: this.center.lat.toString() },
       ];
-      this.$api.dictionary.updateByName(keyArray).then((res) => {
-        let { data, message } = res.data;
-        if (!data) {
-          this.$message.error('设置失败！');
+      this.$api.dictionary.updateDicsByName(keyArray).then((res) => {
+        let { data, message, resultType } = res.data;
+        if (resultType == 2) {
+          console.error(message);
+          return;
         } else {
           this.$message({ message: '设置成功！', type: 'success' });
-          this.loadData();
         }
       });
     },
   },
   created() {
-    this.getCurrentPosition();
+    this.$api.dictionary.getDictionaryByName('上班').then((res) => {
+      const { data, resultType, message } = res.data;
+      if (resultType == 2) {
+        console.error(message);
+        return;
+      }
+      this.shangbanTime = data.content;
+    });
+    this.$api.dictionary.getDictionaryByName('下班').then((res) => {
+      const { data, resultType, message } = res.data;
+      if (resultType == 2) {
+        console.error(message);
+        return;
+      }
+      this.xiabanTime = data.content;
+    });
+    this.$api.dictionary.getDictionaryByName('考勤地点').then((res) => {
+      const { data, resultType, message } = res.data;
+      if (resultType == 2) {
+        console.error(message);
+        return;
+      }
+      this.address = data.content;
+    });
+    this.$api.dictionary.getDictionaryByName('经度').then((res) => {
+      const { data, resultType, message } = res.data;
+      if (resultType == 2) {
+        console.error(message);
+        return;
+      }
+      this.lng = parseFloat(data.content);
+    });
+    this.$api.dictionary.getDictionaryByName('纬度').then((res) => {
+      const { data, resultType, message } = res.data;
+      if (resultType == 2) {
+        console.error(message);
+        return;
+      }
+      this.lat = parseFloat(data.content);
+    });
   },
 };
 </script>

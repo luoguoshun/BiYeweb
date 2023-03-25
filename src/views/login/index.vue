@@ -36,7 +36,7 @@ export default {
     //将 this.setToken(token) 映射为 this.$store.commit('setToken'，token)
     ...mapMutations({
       setTokenInfo: 'token/setTokenInfo',
-      setUserInfo: 'userInfo/setUserInfo',
+      setUserInfo: 'user/setUserInfo',
     }),
     login() {
       if (this.validateLoginInfo()) {
@@ -65,7 +65,7 @@ export default {
           }
         });
       }
-    },  
+    },
     validateLoginInfo() {
       if (this.loginInfo.account == '') {
         this.$message({
@@ -86,15 +86,14 @@ export default {
       return true;
     },
     connectionSignalR() {
-      if (this.$signalR.connection['_connectionState'] == 'Disconnected') {
-        this.$signalR.connection.start();
+      if (this.$signalR && !this.$signalR.connectionBuilder['_connectionStarted']) {
+        this.$signalR.connectionBuilder.start();
       }
     },
   },
   created() {
     localStorage.removeItem('tokenData');
     localStorage.removeItem('routersData');
-    localStorage.removeItem('userInfo');
   },
 };
 </script>

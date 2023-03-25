@@ -13,15 +13,15 @@ export default {
    * @return {*}
    * @param {*} ids
    */
-  deleteByIds(ids) {
-    return axios.get(`/api/Background/Dictionary/DeleteByIds?ids=${ids}`);
+  deleteDicsByIds(ids) {
+    return axios.post(`/api/Background/Dictionary/DeleteDicsByIds`, ids);
   },
   /**
    * @description: 更新字典数据（如果不存在则默认添加）
    * @param {*} keyArr 字典实体数组
    */
   updateDicsByName(keyArr) {
-    return axios.get(`/api/Background/Dictionary/UpdateDicsByName?dtos=${keyArr}`);
+    return axios.post(`/api/Background/Dictionary/UpdateDicsByName`, keyArr);
   },
   /**
    * @description: 新建字典数据
@@ -29,7 +29,7 @@ export default {
    * @param {*} keyArr
    */
   addDictionary(dicDto) {
-    return axios.get(`/api/Background/Dictionary/AddDictionary`, {
+    return axios.post(`/api/Background/Dictionary/AddDictionary`, {
       ...dicDto,
     });
   },
@@ -37,10 +37,13 @@ export default {
    * @description: 更新状态
    * @return {*}
    * @param {*} dicDto
-   */  
+   */
   updateStatus(dicDto) {
-    return axios.get(`/api/Background/Dictionary/UpdateStatus`, {
+    return axios.post(`/api/Background/Dictionary/UpdateStatus`, {
       ...dicDto,
     });
+  },
+  getDictionaryByName(name) {
+    return axios.get(`/api/Background/Dictionary/getDictionaryByName?name=${name}`);
   },
 };

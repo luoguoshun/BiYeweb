@@ -4,11 +4,8 @@ export default {
     userInfo: {},
   },
   getters: {
-    getUserInfo(state) {
-      if (state.userInfo == null) {
-        return null;
-      }
-      return state.userInfo;
+    userInfo(state) {
+      return state.userInfo ?? null;
     },
   },
   //mutations是唯一一种方式来修改state中的状态的；

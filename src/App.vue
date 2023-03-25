@@ -8,9 +8,9 @@
 export default {
   name: 'App',
   created() {
-    // if (this.$signalR.connection['_connectionState'] !== 'Disconnected') {
-    //   this.$signalR.connection.stop();
-    // }
+    if (this.$signalR && !this.$signalR.connectionBuilder['_connectionStarted']) {
+      this.$signalR.connectionBuilder.start();
+    }
   },
 };
 </script>

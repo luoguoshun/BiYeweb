@@ -12,7 +12,8 @@ import 'element-ui/lib/theme-chalk/index.css';
 import './config/elementui.js';
 import BaiduMap from 'vue-baidu-map';
 import { serverAK } from '@/config/defaultString.js';
-import {signalR} from './utils/signalR'
+import connectionBuilder from './utils/signalR';
+import * as timeFormat from './utils/timeFormat.js';
 Vue.config.productionTip = false;
 //#region Object.defineProperty
 // Object.defineproperty（obj, propname, desc  ） 直接在一个对象上定义一个新属性，或者修改一个已经存在的属性
@@ -24,12 +25,15 @@ Object.defineProperty(Vue.prototype, '$api', {
   value: apis,
 });
 Object.defineProperty(Vue.prototype, '$signalR', {
-  value: signalR,
+  value: connectionBuilder,
+});
+Object.defineProperty(Vue.prototype, '$timeFormat', {
+  value: timeFormat,
 });
 //全局注册百度地图
 Vue.use(BaiduMap, {
   // ak 是在百度地图开发者平台申请的密钥 详见 http://lbsyun.baidu.com/apiconsole/key */
-  ak: serverAK,//访问appKey
+  ak: serverAK, //访问appKey
 });
 new Vue({
   render: (h) => h(App),

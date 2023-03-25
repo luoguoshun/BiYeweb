@@ -38,7 +38,7 @@ const store = new Vuex.Store({
     }),
     createPersistedState({
       key: 'userData',
-      paths: ['userInfo.userInfo'],
+      paths: ['user.userInfo'],
     }),
   ],
 });

@@ -29,8 +29,8 @@
             inactive-text="关"
             active-color="rgb(0, 255, 149)"
             inactive-color="rgb(151, 148, 148)"
-            v-model="scope.row.Status"
-            @change="updateState(scope.row)"
+            v-model="scope.row.status"
+            @change="(value) => updateState(scope.row.id, value)"
           />
         </template>
       </el-table-column>
@@ -92,7 +92,7 @@ export default {
         row: 10,
       },
       table: {
-        dictionaryList: [{ id: '1', type: 'system', name: 'haha', content: '8：00', remark: '' }],
+        dictionaryList: [],
         total: 0,
       },
       editVisible: false,
@@ -103,13 +103,14 @@ export default {
   },
   methods: {
     //修改字典状态
-    updateState(row) {
-      this.$api.dictionary.updateStatus(row.id, row.status).then((res) => {
+    updateState(id, value) {
+      console.log(value);
+      this.$api.dictionary.updateStatus({ id: id, status: value }).then((res) => {
         const { data, message } = res.data;
         if (!data) {
           this.$message({ message: message, type: 'error' });
         } else {
-          if (row.state == 1) {
+          if (value == 1) {
             this.$message({ message: '开启成功！', type: 'success' });
           } else {
             this.$message({ message: '禁用成功！', type: 'success' });
@@ -176,11 +177,11 @@ export default {
     addDictionary() {
       this.$api.dictionary.addDictionary(this.dictionaryForm).then((res) => {
         const { data, resultType } = res.data;
-        if (!data) {
+        if (!resultType || resultType == 2) {
           this.$message({ message: '添加失败！', type: 'error' });
         } else {
           this.$message({ message: '添加成功！', type: 'success' });
-          this.dialogObject.createVisible = false;
+          this.editVisible = false;
           this.loadData();
         }
       });
@@ -188,13 +189,12 @@ export default {
     //修改字典数据
     updateDicsByName() {
       this.$api.dictionary.updateDicsByName([this.dictionaryForm]).then((res) => {
-        console.log(res);
-        const { data, resultType } = res.data;
-        if (!data) {
-          this.$message({ message: '修改失败！', type: 'error' });
+        const { data, resultType, message } = res.data;
+        if (!resultType || resultType == 2) {
+          this.$message({ message, type: 'error' });
         } else {
-          this.$message({ message: '修改成功！', type: 'success' });
-          this.dialogObject.updateVisible = false;
+          this.$message({ message, type: 'success' });
+          this.editVisible = false;
           this.loadData();
         }
       });
@@ -233,13 +233,13 @@ export default {
           type: 'warning',
         });
       } else {
-        this.$api.dictionary.deleteByIds(this.dicIds).then((res) => {
-          let { success, message } = res.data;
-          if (!success) {
-            console.log(message);
-            this.$message.error(message);
+        this.$api.dictionary.deleteDicsByIds(this.dicIds).then((res) => {
+          let { resultType, message } = res.data;
+          if (!resultType || resultType == 2) {
+            this.$message({ message, type: 'error' });
           } else {
-            this.$message({ message: '删除成功！', type: 'success' });
+            this.$message({ message, type: 'success' });
+            this.editVisible = false;
             this.loadData();
           }
         });

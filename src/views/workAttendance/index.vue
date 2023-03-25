@@ -12,14 +12,14 @@
       </el-col>
       <el-col :span="2">
         <el-select size="mini" v-model="queryForm.wAType" placeholder="考勤类别">
-          <el-option label="上班" :value="1"></el-option>
-          <el-option label="下班" :value="2"></el-option>
+          <el-option label="上班" value="1"></el-option>
+          <el-option label="下班" value="2"></el-option>
         </el-select>
       </el-col>
       <el-col :span="2">
         <el-select size="mini" v-model="queryForm.WAMethod" placeholder="考勤方式">
-          <el-option label="打卡" :value="1"></el-option>
-          <el-option label="补入" :value="2"></el-option>
+          <el-option label="打卡" value="1"></el-option>
+          <el-option label="补入" value="2"></el-option>
         </el-select>
       </el-col>
       <el-col :span="4">
@@ -34,11 +34,11 @@
       <el-table-column prop="id" label="编号" align="center"> </el-table-column>
       <el-table-column prop="employeeName" label="考勤人" width="150" align="center"></el-table-column>
       <el-table-column prop="departmentName" label="部门" align="center"></el-table-column>
-      <el-table-column prop="wATypeStr" label="上班/下班" align="center"></el-table-column>
-      <el-table-column prop="wAMethodStr" label="考勤方式" align="center"></el-table-column>
-      <el-table-column prop="wALocation" label="考勤地点" align="center"></el-table-column>
-      <el-table-column prop="Longitude" label="考勤经度" align="center"></el-table-column>
-      <el-table-column prop="Latitude" label="考勤纬度" align="center"></el-table-column>
+      <el-table-column prop="waTypeStr" label="上班/下班" align="center"></el-table-column>
+      <el-table-column prop="waMethodStr" label="考勤方式" align="center"></el-table-column>
+      <el-table-column prop="waLocation" label="考勤地点" align="center"></el-table-column>
+      <el-table-column prop="longitude" label="考勤经度" align="center"></el-table-column>
+      <el-table-column prop="latitude" label="考勤纬度" align="center"></el-table-column>
       <el-table-column prop="isOutRange" label="是否超出范围" align="center">
         <template slot-scope="scope">
           {{ scope.row.isOutRange == 0 ? '否' : '是' }}
@@ -50,10 +50,14 @@
         </template>
       </el-table-column>
 
-      <el-table-column prop="createdTime" label="考勤日期" align="center"></el-table-column>
+      <el-table-column prop="createdTime" label="考勤日期" align="center">
+        <template slot-scope="scope">
+          {{ longTime(scope.row.createdTime) }}
+        </template>
+      </el-table-column>
       <el-table-column prop="remark" label="备注" align="center"></el-table-column>
       <!-- 操作 -->
-      <el-table-column fixed="right" label="编辑" width="200" align="center">
+      <el-table-column fixed="right" label="编辑" align="center">
         <!-- <template slot-scope="scope">
           <el-button type="text" size="small" @click="handleOpenDialog(scope.row)" icon="el-icon-edit">考核详情</el-button>
         </template> -->
@@ -77,18 +81,19 @@
     <el-dialog title="考勤信息" center :visible.sync="editVisible" :close-on-click-modal="false" width="30%">
       <el-form ref="createform" :model="workAttendance" label-width="80px">
         <el-form-item label="员工" required>
-          <el-select v-model="workAttendance.employeeId" filterable placeholder="请选择" style="width: 300px;">
+          <el-select v-model="workAttendance.employeeId" filterable placeholder="请选择" style="width: 300px">
             <el-option v-for="item in userOptions" :key="item.employeeId" :label="item.employeeName" :value="item.employeeId"> </el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="考勤类别" required>
-          <el-select v-model="workAttendance.wAType" placeholder="考勤类别" style="width: 300px;">
-            <el-option label="上班" :value="1"></el-option>
-            <el-option label="下班" :value="2"></el-option>
+          <el-select v-model="workAttendance.wAType" placeholder="考勤类别" style="width: 300px">
+            <el-option label="上班" value="1"></el-option>
+            <el-option label="下班" value="2"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="补卡日期" required >
-          <el-date-picker v-model="workAttendance.createdTime" type="date" placeholder="选择日期" value-format="yyyy-MM-dd" style="width: 300px;"> </el-date-picker>
+        <el-form-item label="补卡日期" required>
+          <el-date-picker v-model="workAttendance.createdTime" type="date" placeholder="选择日期" value-format="yyyy-MM-dd" style="width: 300px">
+          </el-date-picker>
         </el-form-item>
         <el-form-item label="备注">
           <el-input type="textarea" :rows="6" v-model="workAttendance.remark" hidden="50px" :autosize="{ minRows: 2, maxRows: 6 }"></el-input>
@@ -108,6 +113,7 @@
 <script>
 import setting from './setting.vue';
 import { checkField } from '@/utils/util';
+import { longTime } from '@/utils/timeFormat';
 export default {
   components: {
     setting,
@@ -132,23 +138,23 @@ export default {
       },
       table: {
         workAttendanceList: [
-          {
-            id: '1',
-            EmployeeId: 'luo',
-            employeeName: 'luoguoshun',
-            departmentName: '技术部门',
-            wAType: '1',
-            wATypeStr: '下班',
-            wAMethod: '1',
-            wAMethodStr: '打卡',
-            wALocation: '广州市天河区',
-            Longitude: 123.22,
-            Latitude: 158,
-            isOutRange: 0,
-            status: 3,
-            createdTime: '2023-3-22 18:00:00',
-            remark: '',
-          },
+          // {
+          //   id: '1',
+          //   EmployeeId: 'luo',
+          //   employeeName: 'luoguoshun',
+          //   departmentName: '技术部门',
+          //   wAType: '1',
+          //   wATypeStr: '下班',
+          //   wAMethod: '1',
+          //   wAMethodStr: '打卡',
+          //   wALocation: '广州市天河区',
+          //   Longitude: 123.22,
+          //   Latitude: 158,
+          //   isOutRange: 0,
+          //   status: 3,
+          //   createdTime: '2023-3-22 18:00:00',
+          //   remark: '',
+          // },
         ],
         total: 0,
       },
@@ -159,6 +165,7 @@ export default {
     };
   },
   methods: {
+    longTime,
     loadData() {
       this.getworkAttendanceList();
       this.getUserList();
@@ -169,9 +176,9 @@ export default {
     resetQueryForm() {
       this.queryForm.row = 10;
       this.queryForm.page = 1;
-      this.queryForm.WAMethod='';
-      this.queryForm.wAType='';
-      this.queryForm.publicationDates=[];
+      this.queryForm.WAMethod = '';
+      this.queryForm.wAType = '';
+      this.queryForm.publicationDates = [];
       this.queryForm.conditions = '';
       this.loadData();
     },
@@ -231,11 +238,11 @@ export default {
       }
       this.$api.workAttendance.addWorkAttendance(this.workAttendance).then((res) => {
         const { data, message, resultType } = res.data;
-        if (!data) {
+        if (!resultType || resultType == 2) {
           this.$message({ message, type: 'error' });
         } else {
           this.$message({ message, type: 'success' });
-          this.dialogObject.createVisible = false;
+          this.editVisible = false;
           this.loadData();
         }
       });
@@ -243,13 +250,12 @@ export default {
     //修改考勤数据
     updateDicsByName() {
       this.$api.workAttendance.updateDicsByName([this.workAttendance]).then((res) => {
-        console.log(res);
         const { data, resultType } = res.data;
         if (!data) {
           this.$message({ message: '修改失败！', type: 'error' });
         } else {
           this.$message({ message: '修改成功！', type: 'success' });
-          this.dialogObject.updateVisible = false;
+          this.editVisible = false;
           this.loadData();
         }
       });
@@ -273,8 +279,8 @@ export default {
         });
       } else {
         this.$api.workAttendance.deleteWorkAttendances(this.workAttendanceIds).then((res) => {
-          let { data, message } = res.data;
-          if (!data) {
+          let { data, message, resultType } = res.data;
+          if (!resultType || resultType == 2) {
             this.$message.error(message);
           } else {
             this.$message({ message: '删除成功！', type: 'success' });

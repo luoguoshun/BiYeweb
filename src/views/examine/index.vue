@@ -25,7 +25,13 @@
     <el-table :data="table.examineList" :header-cell-style="{ 'text-align': 'center' }" @selection-change="selectRows" border="">
       <el-table-column type="selection" width="50" align="center"> </el-table-column>
       <el-table-column prop="id" label="编号" align="center"> </el-table-column>
-      <el-table-column prop="statusStr" label="状态" align="center"> </el-table-column>
+      <el-table-column prop="statusStr" label="状态" align="center">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.status==2">{{ scope.row.statusStr }}</el-tag>
+          <el-tag type="warning" v-if="scope.row.status==4">{{ scope.row.statusStr }}</el-tag>
+          <!-- <el-tag type="danger">标签五</el-tag> -->
+        </template>
+      </el-table-column>
       <el-table-column prop="employeeName" label="员工" width="150" align="center"></el-table-column>
       <el-table-column prop="departmentName" label="部门" align="center"></el-table-column>
       <el-table-column prop="startTime" label="开始考核时间" align="center"></el-table-column>
@@ -36,8 +42,8 @@
       <el-table-column prop="toBeCompleted" label="待完成事项" align="center"> </el-table-column>
       <el-table-column prop="isQualified" label="是否合格" align="center">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.isQualified == 0" type="success">否</el-tag>
-          <el-tag v-else-if="scope.row.isQualified == 1" type="danger">是</el-tag>
+          <el-tag v-if="scope.row.isQualified == 0" type="danger">否</el-tag>
+          <el-tag v-else-if="scope.row.isQualified == 1" type="success">是</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="examineLevel" label="总等级" align="center"> </el-table-column>
@@ -72,7 +78,7 @@
     </div>
     <!-- 新建考核 -->
     <el-dialog title="新建考核" center :visible.sync="addVisible" :close-on-click-modal="false" width="50%">
-      <el-form ref="createform" :model="examine" label-width="80px">
+      <el-form ref="createform" :model="examine" label-width="100px">
         <el-form-item label="员工" required>
           <el-select v-model="examine.employeeId" filterable placeholder="请选择" style="width: 300px">
             <el-option v-for="item in userOptions" :key="item.employeeId" :label="item.employeeName" :value="item.employeeId"> </el-option>
@@ -162,7 +168,7 @@
       </div>
     </el-dialog>
     <!-- 评价标准 -->
-    <el-drawer title="评分标准呢!" :visible.sync="helpVisible" direction="rtl" size="45%">
+    <el-drawer title="评分标准" :visible.sync="helpVisible" direction="rtl" size="45%">
       <el-table :data="gradeData">
         <el-table-column property="level" label="等级" width="60"></el-table-column>
         <el-table-column property="score" label="对应分值" width="100"></el-table-column>
@@ -208,7 +214,6 @@ export default {
         isQualified: '',
         examineLevel: '',
         examineScore: 0,
-        createdTime: '',
         remark: '',
         examineDetails: [],
       },
@@ -221,46 +226,48 @@ export default {
       },
       table: {
         examineList: [
-          {
-            id: '1',
-            employeeId: 'luo',
-            employeeName: 'luoguoshun',
-            departmentName: '技术部门',
-            startTime: '2023-3-22 18:00:00',
-            endTime: '2023-3-22 18:00:00',
-            month: '2023-3',
-            examineUserName: '罗国顺',
-            workCompletionPercentage: '20%',
-            workAttendancePercentage: '20%',
-            toBeCompleted: 123.22,
-            isQualified: '00',
-            examineLevel: 'A',
-            examineScore: 12,
-            createdTime: '2023-3-22 18:00:00',
-            remark: '',
-            status: '1',
-            statusStr: '保存',
-            examineDetails: [
-              {
-                id: '1',
-                itemName: '纪律',
-                examineLevel: 'A',
-                remark: 'q',
-              },
-              {
-                id: '2',
-                itemName: '工作量',
-                examineLevel: 'A',
-                remark: 'q',
-              },
-              {
-                id: '3',
-                itemName: '出勤',
-                examineLevel: 'A',
-                remark: 'q',
-              },
-            ],
-          },
+          //#region
+          // {
+          // id: '1',
+          // employeeId: 'luo',
+          // employeeName: 'luoguoshun',
+          // departmentName: '技术部门',
+          // startTime: '2023-3-22 18:00:00',
+          // endTime: '2023-3-22 18:00:00',
+          // month: '2023-3',
+          // examineUserName: '罗国顺',
+          // workCompletionPercentage: '20%',
+          // workAttendancePercentage: '20%',
+          // toBeCompleted: 123.22,
+          // isQualified: '00',
+          // examineLevel: 'A',
+          // examineScore: 12,
+          // createdTime: '2023-3-22 18:00:00',
+          // remark: '',
+          // status: '1',
+          // statusStr: '保存',
+          // examineDetails: [
+          //   // {
+          //   //   id: '1',
+          //   //   itemName: '纪律',
+          //   //   examineLevel: 'A',
+          //   //   remark: 'q',
+          //   // },
+          //   // {
+          //   //   id: '2',
+          //   //   itemName: '工作量',
+          //   //   examineLevel: 'A',
+          //   //   remark: 'q',
+          //   // },
+          //   // {
+          //   //   id: '3',
+          //   //   itemName: '出勤',
+          //   //   examineLevel: 'A',
+          //   //   remark: 'q',
+          //   // },
+          // ],
+          // },
+          //#endregion
         ],
         total: 0,
       },
@@ -269,34 +276,15 @@ export default {
       helpVisible: false,
       examineIds: [],
       userOptions: [],
-      examineItemList: [
-        {
-          id: '1',
-          itemName: '纪律',
-          examineLevel: '',
-          remark: '',
-        },
-        {
-          id: '2',
-          itemName: '工作量',
-          examineLevel: '',
-          remark: '',
-        },
-        {
-          id: '3',
-          itemName: '出勤',
-          examineLevel: '',
-          remark: '',
-        },
-      ],
+      examineItemList: [],
       gradeData,
     };
   },
   methods: {
     loadData() {
-      // this.getExamineList();
-      // this.getUserList();
-      // this.getExamineItemList();
+      this.getExamineList();
+      this.getUserList();
+      this.getExamineItemList();
     },
     /**
      * @description: 重置搜索条件
@@ -305,6 +293,7 @@ export default {
       this.queryForm.row = 10;
       this.queryForm.page = 1;
       this.queryForm.conditions = '';
+      this.queryForm.employeeId = '';
       this.loadData();
     },
     //获取考核数据
@@ -362,7 +351,7 @@ export default {
       }
     },
     //添加考勤数据
-    addworkAttendance() {
+    addWorkAttendance() {
       if (!checkField(this.examine.employeeId)) {
         this.$message({ message: '请选择职工', type: 'warning' });
         return;
@@ -384,23 +373,23 @@ export default {
           ExamineItemId: item.id,
           ExamineItemName: item.itemName,
           ExamineLevel: item.examineLevel,
-          ExamineDate: '',
           Remark: item.remark,
         });
       });
+      console.log(this.examine.examineDetails);
       if (this.examine.examineDetails.length !== this.examineItemList.length) {
         this.$message({ message: '请完成评分', type: 'warning' });
         return;
       }
       this.examine.isQualified = this.examine.examineLevel == 'D' ? '0' : '1';
       this.examine.month = monthTime(this.examine.month);
-      this.$api.examine.addWorkAttendance(this.examine).then((res) => {
+      this.$api.examine.addExamine(this.examine).then((res) => {
         const { data, message, resultType } = res.data;
-        if (!data) {
+        if (!resultType || resultType == 2) {
           this.$message({ message, type: 'error' });
         } else {
           this.$message({ message, type: 'success' });
-          this.dialogObject.createVisible = false;
+          this.addVisible = false;
           this.loadData();
         }
       });
@@ -420,7 +409,7 @@ export default {
       });
     },
     handleConfirm() {
-      this.addworkAttendance();
+      this.addWorkAttendance();
     },
     //获取选中行的数据
     selectRows(selection) {

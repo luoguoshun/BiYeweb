@@ -6,10 +6,9 @@ import * as signalR from '@microsoft/signalr';
 import store from '../store/index.js';
 import { baseUrl } from '@/config/defaultString.js';
 import { Message, Notification } from 'element-ui';
-let hubUrl = baseUrl + '/chatHub';
 //连接集线器
-let connection = new signalR.HubConnectionBuilder()
-  .withUrl(hubUrl, {
+const connectionBuilder = new signalR.HubConnectionBuilder()
+  .withUrl(`${baseUrl}/chatHub`, {
     skipNegotiation: true,
     transport: signalR.HttpTransportType.WebSockets,
     accessTokenFactory: () => store.getters['token/accessToken'], //连接集线器需要认证
@@ -17,20 +16,21 @@ let connection = new signalR.HubConnectionBuilder()
   .withAutomaticReconnect([0, 2000, 10000, 30000]) //配置自动重新连接服务器时间
   .configureLogging(signalR.LogLevel.Error) //配置日志
   .build();
-//注册方法 用于服务器向客户端调取
-connection.on('SendMessageToGroup', function (message) {
+//#region  注册方法 用于服务器向客户端调取
+connectionBuilder.on('SendMessageToGroup', function (message) {
   console.log(message.Content);
 });
-connection.on('SendPrivateMessage', function (message) {
+connectionBuilder.on('SendPrivateMessage', function (message) {
   Notification.info({
     title: message.Title,
     message: message.Content,
     position: 'bottom-right',
   });
 });
-connection.on('Abort', function (message) {
+connectionBuilder.on('Abort', function (message) {
   Message.warning(message.Content);
 });
+//#endregion
 export default {
-  connection,
+  connectionBuilder,
 };

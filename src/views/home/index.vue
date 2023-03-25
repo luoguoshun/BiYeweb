@@ -22,7 +22,7 @@
             <el-collapse v-model="activeSysMessageId" accordion>
               <el-collapse-item v-for="item in systemMessageList" :key="item.messageId" :name="item.messageId">
                 <template slot="title">
-                  {{ item.title }}
+                 <h4>{{ item.title }}</h4> 
                 </template>
                 <div class="collapseContent">{{ item.content }}</div>
                 <div>
@@ -35,7 +35,7 @@
             <el-collapse v-model="activeMyMessageId" @change="readMessage" accordion>
               <el-collapse-item v-for="item in messageList" :key="item.messageId" :name="item.messageId">
                 <template slot="title">
-                  <i class="el-icon-chat-dot-round"></i>{{ item.title }}
+                  <i class="el-icon-chat-dot-round"></i>  <h4>{{ item.title }}</h4> 
                   <el-badge v-if="item.messageState != 4" is-dot />
                 </template>
                 <div class="collapseContent">{{ item.content }}</div>
@@ -117,21 +117,15 @@ export default {
         },
       ],
       tableData: [],
-      tableLabel: {
-        name: '课程',
-        todayBuy: '今日购买',
-        monthBuy: '本月购买',
-        totalBuy: '总购买',
-      },
       messageList: [],
-      systemMessageList: [{ messageId: 'ME366666', title: '测试', content: 'hahah' }],
+      systemMessageList: [],
       activeSysMessageId: '',
       activeMyMessageId: '',
       activeName: 'systemMessage',
     };
   },
   computed: {
-    ...mapGetters({ userInfo: 'userInfo/getUserInfo' }),
+    ...mapGetters({ userInfo: 'user/userInfo' }),
   },
   methods: {
     gethomeData() {
@@ -153,10 +147,6 @@ export default {
         tooltip: {
           trigger: 'item',
         },
-        // legend: {
-        //   orient: 'vertical',
-        //   left: 'bottom',
-        // },
         series: [
           {
             name: 'Access From',
@@ -243,7 +233,13 @@ export default {
     },
     //获取系统所有消息列表
     async getSystemMessageList() {
-      await this.$api.message.getMessageList(1, 10, '', 3).then((res) => {
+      const query = {
+        page: 1,
+        row: 10,
+        conditions: '',
+        messageType: 4,
+      };
+      await this.$api.message.getMessageList(query).then((res) => {
         const { data, success, message } = res.data;
         if (!success) {
           return;
@@ -282,6 +278,8 @@ export default {
   },
   created() {
     this.gethomeData();
+    this.getMessageListByUserId();
+    this.getSystemMessageList();
   },
   mounted() {
     this.initDeptCountStatistics();

@@ -35,11 +35,11 @@ export default {
     };
   },
   computed: {
-    ...mapGetters({ userInfo: 'userInfo/getUserInfo' }),
+    ...mapGetters({ userInfo: 'user/userInfo' }),
   },
   methods: {
     ...mapMutations({
-      clearUserInfo: 'userInfo/clearUserInfo',
+      clearUserInfo: 'user/clearUserInfo',
       clearToken: 'token/clearToken',
       closeAllTags: 'lable/closeAllTags',
       collapseMenu: 'tab/collapseMenu', //控制左侧菜单是否折叠
@@ -49,11 +49,9 @@ export default {
      * @return {*}
      */
     logOut() {
-      this.$store.commit('userInfo/clearUserInfo');
+      this.$store.commit('user/clearUserInfo');
       this.$store.commit('token/clearToken');
-      this.$store.commit('userInfo/clearUserInfo');
-
-      // this.clearUserInfo();
+      this.$store.commit('user/clearUserInfo');
       this.closeAllTags();
       this.clearToken();
       this.$router.push({ name: 'login' });
@@ -62,7 +60,6 @@ export default {
   created() {
     //获取路由内的全部信息
     this.breadcrumbList = this.$route.matched.filter((item, index) => index != 0);
-    console.log(store);
   },
   watch: {
     //监听，实时获取路由变动信息

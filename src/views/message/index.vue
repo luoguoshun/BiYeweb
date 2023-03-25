@@ -7,6 +7,7 @@
       </el-col>
       <el-col :span="3">
         <el-select size="mini" v-model="queryForm.messageType" placeholder="消息类型">
+          <el-option :value="0" label="所有类型"></el-option>
           <el-option :value="1" label="消息发送"></el-option>
           <el-option :value="2" label="个人通知"></el-option>
           <el-option :value="3" label="数据统计"></el-option>
@@ -57,7 +58,6 @@
         </template>
       </el-table-column>
       <el-table-column prop="content" label="内容" align="center"> </el-table-column>
-      <!-- <el-table-column prop="messageParameter" label="内容" align="center"> </el-table-column> -->
       <el-table-column prop="messageParameter" label="消息参数" align="center" v-if="true">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="openMessageParameter(scope.row.messageParameter)" plain>查看详情</el-button>
@@ -98,7 +98,7 @@
         </el-form-item>
         <el-form-item label="接收人" prop="receiverId" v-if="addMessageForm.messageType == 2">
           <el-select v-model="addMessageForm.receiverId" filterable placeholder="请选择接收人">
-            <el-option v-for="item in userList" :key="item.userId" :label="item.name" :value="item.userId"> </el-option>
+            <el-option v-for="item in userList" :key="item.employeeId" :label="item.employeeName" :value="item.employeeId"> </el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="内容" prop="content">
@@ -131,7 +131,7 @@ export default {
         page: 1,
         row: 10,
         conditions: '',
-        messageType: '',
+        messageType: 0,
       },
       addMessageForm: {
         senderId: '',
@@ -167,7 +167,6 @@ export default {
     },
     //获取所有消息列表
     async getMessageList() {
-      console.log(this.queryForm.messageType);
       await this.$api.message.getMessageList(this.queryForm).then((res) => {
         const { data, success, message } = res.data;
         if (!success) {
@@ -225,11 +224,10 @@ export default {
     async getUserList() {
       await this.$api.employee.getUserList(1, 100, '', '').then((res) => {
         const { data, success, message } = res.data;
-        console.log(data);
-        if (!success) {
+        if (!data) {
           return;
         }
-        this.userList = data.users;
+        this.userList = data;
       });
     },
     openMessageParameter(row) {
@@ -259,8 +257,8 @@ export default {
     },
     //打开新建弹窗
     OpenAddMessageDiolog() {
-      this.addMessageForm.senderName = store.getters['userList/getUserInfo'].name;
-      this.addMessageForm.senderId = store.getters['userList/getUserInfo'].userId;
+      this.addMessageForm.senderName = store.getters['user/userInfo'].name;
+      this.addMessageForm.senderId = store.getters['user/userInfo'].userId;
       this.dialogObject.addVisible = true;
     },
     handleSizeChange(row) {
@@ -276,13 +274,14 @@ export default {
     resetQueryForm() {
       this.queryForm.page = 1;
       this.queryForm.row = 10;
-      this.queryForm.messageType = '';
+      this.queryForm.messageType = 0;
       this.queryForm.conditions = '';
       this.loadData();
     },
   },
   created() {
     this.loadData();
+    this.getUserList();
   },
 };
 </script>
