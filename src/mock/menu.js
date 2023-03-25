@@ -81,6 +81,12 @@ export default {
           label: '消息通知',
           icon: 'el-icon-chat-dot-square',
         },
+        {
+          path: '/clockIn',
+          name: 'clockIn',
+          label: '打卡',
+          icon: 'el-icon-place',
+        },
       ],
     };
   },

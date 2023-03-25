@@ -1,6 +1,6 @@
 <template>
   <el-row class="home" :gutter="20">
-    <el-col :span="8" style="margin-top: 20px">
+    <el-col :span="8">
       <!--shadow属性设置卡片阴影出现的时机-->
       <el-card shadow="hover">
         <div class="user">
@@ -11,8 +11,8 @@
           </div>
         </div>
         <div class="login-info">
-          <p>上次登录时间：<span>2019-10-20</span></p>
-          <p>上次登录地点：<span>北京</span></p>
+          <p>上次登录时间：<span>2023-05-10</span></p>
+          <p>上次登录地点：<span>桂林市雁山区</span></p>
         </div>
       </el-card>
       <!-- 系统通知 -->
@@ -22,7 +22,7 @@
             <el-collapse v-model="activeSysMessageId" accordion>
               <el-collapse-item v-for="item in systemMessageList" :key="item.messageId" :name="item.messageId">
                 <template slot="title">
-                 <h4>{{ item.title }}</h4> 
+                  <h4>{{ item.title }}</h4>
                 </template>
                 <div class="collapseContent">{{ item.content }}</div>
                 <div>
@@ -35,7 +35,8 @@
             <el-collapse v-model="activeMyMessageId" @change="readMessage" accordion>
               <el-collapse-item v-for="item in messageList" :key="item.messageId" :name="item.messageId">
                 <template slot="title">
-                  <i class="el-icon-chat-dot-round"></i>  <h4>{{ item.title }}</h4> 
+                  <i class="el-icon-chat-dot-round"></i>
+                  <h4>{{ item.title }}</h4>
                   <el-badge v-if="item.messageState != 4" is-dot />
                 </template>
                 <div class="collapseContent">{{ item.content }}</div>
@@ -48,12 +49,12 @@
         </el-tabs>
       </el-card>
     </el-col>
-    <el-col :span="16" style="margin-top: 20px">
+    <el-col :span="16">
       <div class="num">
         <el-card shadow="hover" v-for="item in countData" :key="item.name" :body-style="{ display: 'flex', padding: 0 }">
-          <i class="icon" :class="`el-icon-${item.icon}`" :style="{ background: item.color }"></i>
+          <i class="icon" :class="item.icon" :style="{ background: item.color }"></i>
           <div class="detail">
-            <p class="num">￥ {{ item.value }}</p>
+            <p class="num">{{ item.value }}</p>
             <p class="txt">{{ item.name }}</p>
           </div>
         </el-card>
@@ -77,42 +78,23 @@ import * as echarts from 'echarts';
 export default {
   data() {
     return {
-      userImg: require('../../assets/images/user.png'),
       countData: [
         {
-          name: '今日支付订单',
-          value: 1234,
-          icon: 'success',
+          name: '今日系统活跃',
+          value: 0,
+          icon: 'el-icon-star-on',
           color: '#2ec7c9',
         },
         {
-          name: '今日收藏订单',
-          value: 210,
-          icon: 'star-on',
+          name: '今日打卡',
+          value: 0,
+          icon: 'el-icon-place',
           color: '#ffb980',
         },
         {
-          name: '今日未支付订单',
-          value: 1234,
-          icon: 's-goods',
-          color: '#5ab1ef',
-        },
-        {
-          name: '本月支付订单',
-          value: 1234,
-          icon: 'success',
-          color: '#2ec7c9',
-        },
-        {
-          name: '本月收藏订单',
-          value: 210,
-          icon: 'star-on',
-          color: '#ffb980',
-        },
-        {
-          name: '本月未支付订单',
-          value: 1234,
-          icon: 's-goods',
+          name: '系统用户',
+          value: 0,
+          icon: 'el-icon-user-solid',
           color: '#5ab1ef',
         },
       ],
@@ -140,7 +122,7 @@ export default {
       let myChart = echarts.init(chartDom);
       let option = {
         title: {
-          text: 'Referer of a Website',
+          text: '今日考勤',
           subtext: 'Fake Data',
           left: 'center',
         },
@@ -275,6 +257,31 @@ export default {
         }
       });
     },
+    /**
+     * @description: 基础数据统计
+     * @return {*}
+     */
+    initBaseData() {
+      try {
+        //改变this指向问题
+        const _this = this;
+        this.$signalR.connectionBuilder.on('SendDataStatistics', function (message) {
+          if (message && message.MessageParameter) {
+            _this.countData.forEach((item) => {
+              if (item.name.indexOf('系统活跃') !== -1) {
+                item.value = message.MessageParameter.todayLoginTotal;
+              } else if (item.name.indexOf('今日打卡') !== -1) {
+                item.value = message.MessageParameter.workAttendanceCount;
+              } else if (item.name.indexOf('系统用户') !== -1) {
+                item.value = message.MessageParameter.employeeCount;
+              }
+            });
+          }
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    },
   },
   created() {
     this.gethomeData();
@@ -284,6 +291,7 @@ export default {
   mounted() {
     this.initDeptCountStatistics();
     this.initotnerCountStatistics();
+    this.initBaseData();
   },
 };
 </script>

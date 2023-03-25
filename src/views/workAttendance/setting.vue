@@ -1,9 +1,8 @@
 <template>
   <div id="workAttendance">
     <el-row>
-      <el-col class="left" :span="6"> 
-        <h3>        <el-tag type="warning">当前设置</el-tag>
-</h3>
+      <el-col class="left" :span="6">
+        <h3><el-tag type="warning">当前设置</el-tag></h3>
         <el-row>
           <el-col :span="24"> 经度:{{ center.lng }} </el-col>
           <el-col :span="124"> 维度:{{ center.lat }} </el-col>
