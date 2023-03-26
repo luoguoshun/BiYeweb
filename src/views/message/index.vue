@@ -93,13 +93,13 @@
             <el-option :value="4" label="系统通知"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="标题" prop="title">
-          <el-input v-model="addMessageForm.title"></el-input>
-        </el-form-item>
         <el-form-item label="接收人" prop="receiverId" v-if="addMessageForm.messageType == 2">
           <el-select v-model="addMessageForm.receiverId" filterable placeholder="请选择接收人">
             <el-option v-for="item in userList" :key="item.employeeId" :label="item.employeeName" :value="item.employeeId"> </el-option>
           </el-select>
+        </el-form-item>
+        <el-form-item label="标题" prop="title">
+          <el-input v-model="addMessageForm.title"></el-input>
         </el-form-item>
         <el-form-item label="内容" prop="content">
           <el-input type="textarea" v-model="addMessageForm.content" placeholder=""></el-input>

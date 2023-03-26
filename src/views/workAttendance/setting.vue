@@ -141,15 +141,20 @@ export default {
      * @description: 获取当前位置
      */
     getCurrentPosition() {
-      axios({
-        method: 'get',
-        url: `https://api.map.baidu.com/location/ip`,
-        params: {
-          ak: serverAK,
-          coor: 'bd09ll',
-        },
-      }).then(function (res) {
+      const _this = this;
+      var geolocation = new BMapGL.Geolocation();
+      geolocation.getCurrentPosition(function (res) {
         console.log(res);
+        if (this.getStatus() == BMAP_STATUS_SUCCESS) {
+          const province = res.address.province;
+          const city = res.address.city;
+          const district = res.address.district;
+          const street = res.address.street;
+          const street_number = res.address.street_number;
+          _this.address = province + city + district + street + street_number;
+          _this.center.lng = res.longitude;
+          _this.center.lat = res.latitude;
+        }
       });
     },
     /**

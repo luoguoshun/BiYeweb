@@ -116,14 +116,14 @@ export default {
         this.tableData = res.data.tableData;
       });
     },
-    //初始化部门人数统计
-    initDeptCountStatistics() {
+    //初始化考勤信息统计
+    initClockInCountStatistics() {
       let chartDom = document.getElementById('deptCountStatistics');
       let myChart = echarts.init(chartDom);
       let option = {
         title: {
           text: '今日考勤',
-          subtext: 'Fake Data',
+          subtext: '统计',
           left: 'center',
         },
         tooltip: {
@@ -289,7 +289,7 @@ export default {
     this.getSystemMessageList();
   },
   mounted() {
-    this.initDeptCountStatistics();
+    this.initClockInCountStatistics();
     this.initotnerCountStatistics();
     this.initBaseData();
   },

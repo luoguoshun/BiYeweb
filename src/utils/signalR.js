@@ -28,7 +28,7 @@ connectionBuilder.on('SendPrivateMessage', function (message) {
   });
 });
 connectionBuilder.on('Abort', function (message) {
-  Message.warning(message.Content);
+  // Message.warning(message.Content);
 });
 //#endregion
 export default {

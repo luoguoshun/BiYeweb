@@ -2,12 +2,24 @@
   <div class="wa-container">
     <el-row class="editbar" :gutter="20">
       <el-col :span="9">
-        <el-button type="primary" size="mini" class="el-icon-folder-add" @click="handleOpenDialog()">补入 </el-button>
-        <el-button type="danger" size="mini" class="el-icon-delete" @click="deleteWorkById()"> 移除 </el-button>
-        <el-button type="success" size="mini" class="el-icon-s-tools" @click="setVisible = true"> 设置 </el-button>
+        <el-button type="primary" size="mini" class="el-icon-folder-add" @click="handleOpenDialog()"
+          >补入
+        </el-button>
+        <el-button type="danger" size="mini" class="el-icon-delete" @click="deleteWorkById()">
+          移除
+        </el-button>
+        <el-button type="success" size="mini" class="el-icon-s-tools" @click="setVisible = true">
+          设置
+        </el-button>
       </el-col>
       <el-col :span="5">
-        <el-date-picker v-model="queryForm.publicationDates" type="daterange" start-placeholder="开始日期" end-placeholder="结束日期" size="mini">
+        <el-date-picker
+          v-model="queryForm.publicationDates"
+          type="daterange"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+          size="mini"
+        >
         </el-date-picker>
       </el-col>
       <el-col :span="2">
@@ -23,16 +35,36 @@
         </el-select>
       </el-col>
       <el-col :span="4">
-        <el-input v-model="queryForm.conditions" size="mini" label-width="80px" placeholder="请输入关键字"></el-input>
+        <el-input
+          v-model="queryForm.conditions"
+          size="mini"
+          label-width="80px"
+          placeholder="请输入关键字"
+        ></el-input>
       </el-col>
-      <el-col :span="1"> <el-button type="primary" @click="loadData()" size="mini">查找</el-button> </el-col>
-      <el-col :span="1"> <el-button type="primary" @click="resetQueryForm()" size="mini">重置</el-button></el-col>
+      <el-col :span="1">
+        <el-button type="primary" @click="loadData()" size="mini">查找</el-button>
+      </el-col>
+      <el-col :span="1">
+        <el-button type="primary" @click="resetQueryForm()" size="mini">重置</el-button></el-col
+      >
     </el-row>
     <!-- 表格 -->
-    <el-table :data="table.workAttendanceList" :header-cell-style="{ 'text-align': 'center' }" @selection-change="selectRows" border="">
+    <el-table
+      :data="table.workAttendanceList"
+      :header-cell-style="{ 'text-align': 'center' }"
+      @selection-change="selectRows"
+      border=""
+      :row-class-name="tableRowClassName"
+    >
       <el-table-column type="selection" width="50" align="center"> </el-table-column>
       <el-table-column prop="id" label="编号" align="center"> </el-table-column>
-      <el-table-column prop="employeeName" label="考勤人" width="150" align="center"></el-table-column>
+      <el-table-column
+        prop="employeeName"
+        label="考勤人"
+        width="150"
+        align="center"
+      ></el-table-column>
       <el-table-column prop="departmentName" label="部门" align="center"></el-table-column>
       <el-table-column prop="waTypeStr" label="上班/下班" align="center"></el-table-column>
       <el-table-column prop="waMethodStr" label="考勤方式" align="center"></el-table-column>
@@ -44,9 +76,16 @@
           {{ scope.row.isOutRange == 0 ? '否' : '是' }}
         </template>
       </el-table-column>
+      <el-table-column prop="distanceTarget" label="距离位置(米)" align="center">
+        <template slot-scope="scope">
+          {{ scope.row.distanceTarget}}
+        </template>
+      </el-table-column>
       <el-table-column prop="status" label="状态" align="center">
         <template slot-scope="scope">
-          <el-tag :type="getTagType(scope.row.status)['type']">{{ getTagType(scope.row.status)['text'] }}</el-tag>
+          <el-tag :type="getTagType(scope.row.status)['type']">{{
+            getTagType(scope.row.status)['text']
+          }}</el-tag>
         </template>
       </el-table-column>
 
@@ -58,9 +97,15 @@
       <el-table-column prop="remark" label="备注" align="center"></el-table-column>
       <!-- 操作 -->
       <el-table-column fixed="right" label="编辑" align="center">
-        <!-- <template slot-scope="scope">
-          <el-button type="text" size="small" @click="handleOpenDialog(scope.row)" icon="el-icon-edit">考核详情</el-button>
-        </template> -->
+        <template slot-scope="scope">
+          <el-button
+            v-if="scope.row.status !== 3"
+            type="success"
+            size="mini"
+            @click="handleUpdateStatus(scope.row)"
+            >标记正常</el-button
+          >
+        </template>
       </el-table-column>
     </el-table>
     <!-- 分页 -->
@@ -78,11 +123,28 @@
       </el-pagination>
     </div>
     <!-- 添加考勤信息对话框 -->
-    <el-dialog title="考勤信息" center :visible.sync="editVisible" :close-on-click-modal="false" width="30%">
+    <el-dialog
+      title="考勤信息"
+      center
+      :visible.sync="editVisible"
+      :close-on-click-modal="false"
+      width="30%"
+    >
       <el-form ref="createform" :model="workAttendance" label-width="80px">
         <el-form-item label="员工" required>
-          <el-select v-model="workAttendance.employeeId" filterable placeholder="请选择" style="width: 300px">
-            <el-option v-for="item in userOptions" :key="item.employeeId" :label="item.employeeName" :value="item.employeeId"> </el-option>
+          <el-select
+            v-model="workAttendance.employeeId"
+            filterable
+            placeholder="请选择"
+            style="width: 300px"
+          >
+            <el-option
+              v-for="item in userOptions"
+              :key="item.employeeId"
+              :label="item.employeeName"
+              :value="item.employeeId"
+            >
+            </el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="考勤类别" required>
@@ -92,11 +154,23 @@
           </el-select>
         </el-form-item>
         <el-form-item label="补卡日期" required>
-          <el-date-picker v-model="workAttendance.createdTime" type="date" placeholder="选择日期" value-format="yyyy-MM-dd" style="width: 300px">
+          <el-date-picker
+            v-model="workAttendance.createdTime"
+            type="date"
+            placeholder="选择日期"
+            value-format="yyyy-MM-dd"
+            style="width: 300px"
+          >
           </el-date-picker>
         </el-form-item>
         <el-form-item label="备注">
-          <el-input type="textarea" :rows="6" v-model="workAttendance.remark" hidden="50px" :autosize="{ minRows: 2, maxRows: 6 }"></el-input>
+          <el-input
+            type="textarea"
+            :rows="6"
+            v-model="workAttendance.remark"
+            hidden="50px"
+            :autosize="{ minRows: 2, maxRows: 6 }"
+          ></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -104,7 +178,14 @@
         <el-button type="success" @click="handleConfirm()">确定</el-button>
       </div>
     </el-dialog>
-    <el-dialog title="考勤设置" center :visible.sync="setVisible" :close-on-click-modal="false" width="40%" :fullscreen="true">
+    <el-dialog
+      title="考勤设置"
+      center
+      :visible.sync="setVisible"
+      :close-on-click-modal="false"
+      width="40%"
+      :fullscreen="true"
+    >
       <setting></setting>
     </el-dialog>
   </div>
@@ -135,6 +216,7 @@ export default {
         publicationDates: [],
         page: 1,
         row: 10,
+        conditions:'',
       },
       table: {
         workAttendanceList: [
@@ -289,16 +371,32 @@ export default {
         });
       }
     },
+    //标记为正常
+    handleUpdateStatus(row) {
+      const work = {
+        id: row.id,
+        status: 3,
+      };
+      this.$api.workAttendance.updateStatus(work).then((res) => {
+        const { data, message, resultType } = res.data;
+        if (!resultType || resultType == 2) {
+          this.$message({ message, type: 'error' });
+        } else {
+          this.$message({ message, type: 'success' });
+          this.loadData();
+        }
+      });
+    },
     getTagType(status) {
       switch (status) {
         case 1:
           return {
-            type: 'warning',
+            type: 'danger',
             text: '迟到',
           };
         case 2:
           return {
-            type: 'warning',
+            type: 'danger',
             text: '早退',
           };
         case 3:
@@ -306,12 +404,25 @@ export default {
             type: 'success',
             text: '正常',
           };
+        case 4:
+          return {
+            type: 'warning',
+            text: '异常',
+          };
         default:
           return {
             type: '',
             text: '',
           };
       }
+    },
+    tableRowClassName({ row, rowIndex }) {
+      if (row.status === 1 || row.status === 2 || row.status === 4) {
+        return 'warning-row';
+      } else if (row.status === 3) {
+        return 'success-row';
+      }
+      return 'success-row';
     },
   },
   created() {
@@ -326,6 +437,14 @@ export default {
   height: 100%;
   .editbar {
     margin-bottom: 10px;
+  }
+  .el-table {
+    .warning-row {
+      background: oldlace;
+    }
+    .success-row {
+      background: #f0f9eb;
+    }
   }
 }
 </style>

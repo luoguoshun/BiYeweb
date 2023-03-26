@@ -84,7 +84,7 @@ export default {
         {
           path: '/clockIn',
           name: 'clockIn',
-          label: '打卡',
+          label: '今日打卡',
           icon: 'el-icon-place',
         },
       ],

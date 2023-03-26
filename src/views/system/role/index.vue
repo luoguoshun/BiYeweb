@@ -3,18 +3,37 @@
     <!-- 操作 -->
     <div class="editbar">
       <div class="edit_btn">
-        <el-button type="primary" size="mini" class="el-icon-folder-add" @click="openCreateDialog()">添加 </el-button>
-        <el-button type="danger" size="mini" class="el-icon-delete" @click="deleteRoleIdById()"> 移除 </el-button>
-        <el-upload class="upload" action="" :http-request="importRolesByExcel" :auto-upload="true" :limit="1" :show-file-list="false">
+        <el-button type="primary" size="mini" class="el-icon-folder-add" @click="openCreateDialog()"
+          >添加
+        </el-button>
+        <el-button type="danger" size="mini" class="el-icon-delete" @click="deleteRoleIdById()">
+          移除
+        </el-button>
+        <el-upload
+          class="upload"
+          action=""
+          :http-request="importRolesByExcel"
+          :auto-upload="true"
+          :limit="1"
+          :show-file-list="false"
+        >
           <el-button slot="trigger" size="mini" type="success"> 导入数据 </el-button>
         </el-upload>
-        <el-button slot="trigger" size="mini" type="warning" @click="exportRoleDataToExcel()"> 导出数据 </el-button>
+        <el-button slot="trigger" size="mini" type="warning" @click="exportRoleDataToExcel()">
+          导出数据
+        </el-button>
       </div>
     </div>
     <!-- 表格 -->
-    <el-table :data="table.roleList" :header-cell-style="{ 'text-align': 'center' }" @selection-change="selectRows" border="">
+    <el-table
+      :data="table.roleList"
+      :header-cell-style="{ 'text-align': 'center' }"
+      @selection-change="selectRows"
+      border=""
+    >
       <el-table-column type="selection" width="50" align="center"> </el-table-column>
-      <el-table-column prop="roleId" fixed label="角色编号" width="180" align="center"> </el-table-column>
+      <el-table-column prop="roleId" fixed label="角色编号" width="180" align="center">
+      </el-table-column>
       <el-table-column prop="roleName" label="角色名" width="150" align="center"></el-table-column>
       <el-table-column prop="description" label="角色描述" align="center"></el-table-column>
       <el-table-column prop="state" label="状态" align="center">
@@ -33,14 +52,28 @@
       <!-- 操作 -->
       <el-table-column fixed="right" label="编辑" width="200" align="center">
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="openAllocationDiolog(scope.row)" icon="el-icon-edit">分配权限</el-button>
-          <el-button type="text" size="small" @click="updateDiolog(scope.row)" icon="el-icon-edit">详细信息</el-button>
+          <el-button
+            type="text"
+            size="small"
+            @click="openAllocationDiolog(scope.row)"
+            icon="el-icon-edit"
+            >分配权限</el-button
+          >
+          <el-button type="text" size="small" @click="updateDiolog(scope.row)" icon="el-icon-edit"
+            >详细信息</el-button
+          >
         </template>
       </el-table-column>
     </el-table>
 
     <!-- 修改角色信息对话框 -->
-    <el-dialog title="角色信息" center :visible.sync="dialogObject.updateVisible" :close-on-click-modal="false" width="40%">
+    <el-dialog
+      title="角色信息"
+      center
+      :visible.sync="dialogObject.updateVisible"
+      :close-on-click-modal="false"
+      width="40%"
+    >
       <el-form ref="updateform" :model="roleForm" label-width="80px">
         <el-form-item label="角色Id">
           <el-input v-model="roleForm.roleId" disabled></el-input>
@@ -49,7 +82,12 @@
           <el-input v-model="roleForm.roleName"></el-input>
         </el-form-item>
         <el-form-item label="角色描述">
-          <el-input type="textarea" :rows="6" v-model="roleForm.description" hidden="50px"></el-input>
+          <el-input
+            type="textarea"
+            :rows="6"
+            v-model="roleForm.description"
+            hidden="50px"
+          ></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -59,7 +97,14 @@
     </el-dialog>
 
     <!-- 权限分配信息对话框 -->
-    <el-dialog title="权限分配" center :visible.sync="dialogObject.allocationDiolog" :close-on-click-modal="false" width="45%" :append-to-body="true">
+    <el-dialog
+      title="权限分配"
+      center
+      :visible.sync="dialogObject.allocationDiolog"
+      :close-on-click-modal="false"
+      width="45%"
+      :append-to-body="true"
+    >
       角色：<el-tag>{{ roleForm.roleName }}</el-tag>
       <el-divider></el-divider>
       <el-tree
@@ -85,7 +130,13 @@
     </el-dialog>
 
     <!-- 添加角色信息对话框 -->
-    <el-dialog title="添加角色" center :visible.sync="dialogObject.createVisible" :close-on-click-modal="false" width="40%">
+    <el-dialog
+      title="添加角色"
+      center
+      :visible.sync="dialogObject.createVisible"
+      :close-on-click-modal="false"
+      width="40%"
+    >
       <el-form ref="createform" :model="roleForm" label-width="80px">
         <el-form-item label="角色Id">
           <el-input v-model="roleForm.roleId"></el-input>
@@ -94,7 +145,12 @@
           <el-input v-model="roleForm.roleName"></el-input>
         </el-form-item>
         <el-form-item label="角色描述">
-          <el-input type="textarea" :rows="6" v-model="roleForm.description" hidden="50px"></el-input>
+          <el-input
+            type="textarea"
+            :rows="6"
+            v-model="roleForm.description"
+            hidden="50px"
+          ></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -289,10 +345,9 @@ export default {
         });
       } else {
         this.$api.role.deleteRoleIdById(this.roleIds).then((res) => {
-          let { success, message } = res.data;
-          if (!success) {
-            console.log(message);
-            this.$message.error('删除失败！');
+          let { resultType, message } = res.data;
+          if (!resultType || resultType == 2) {
+            this.$message.error(message);
           } else {
             this.$message({ message: '删除成功！', type: 'success' });
             this.loadData();
