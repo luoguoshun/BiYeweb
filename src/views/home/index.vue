@@ -20,20 +20,34 @@
         <el-tabs v-model="activeName" type="card">
           <el-tab-pane label="系统通知" name="systemMessage">
             <el-collapse v-model="activeSysMessageId" accordion>
-              <el-collapse-item v-for="item in systemMessageList" :key="item.messageId" :name="item.messageId">
+              <el-collapse-item
+                v-for="item in systemMessageList"
+                :key="item.messageId"
+                :name="item.messageId"
+              >
                 <template slot="title">
                   <h4>{{ item.title }}</h4>
                 </template>
                 <div class="collapseContent">{{ item.content }}</div>
                 <div>
-                  <el-button v-if="item.messageParameter" type="warning" size="mini" @click="processEvent(item.messageParameter)">详情 </el-button>
+                  <el-button
+                    v-if="item.messageParameter"
+                    type="warning"
+                    size="mini"
+                    @click="processEvent(item.messageParameter)"
+                    >详情
+                  </el-button>
                 </div>
               </el-collapse-item>
             </el-collapse>
           </el-tab-pane>
           <el-tab-pane label="我的消息" name="second">
             <el-collapse v-model="activeMyMessageId" @change="readMessage" accordion>
-              <el-collapse-item v-for="item in messageList" :key="item.messageId" :name="item.messageId">
+              <el-collapse-item
+                v-for="item in messageList"
+                :key="item.messageId"
+                :name="item.messageId"
+              >
                 <template slot="title">
                   <i class="el-icon-chat-dot-round"></i>
                   <h4>{{ item.title }}</h4>
@@ -41,7 +55,13 @@
                 </template>
                 <div class="collapseContent">{{ item.content }}</div>
                 <div>
-                  <el-button v-if="item.messageParameter" type="warning" size="mini" @click="processEvent(item.messageParameter)">详情 </el-button>
+                  <el-button
+                    v-if="item.messageParameter"
+                    type="warning"
+                    size="mini"
+                    @click="processEvent(item.messageParameter)"
+                    >详情
+                  </el-button>
                 </div>
               </el-collapse-item>
             </el-collapse>
@@ -51,7 +71,12 @@
     </el-col>
     <el-col :span="16">
       <div class="num">
-        <el-card shadow="hover" v-for="item in countData" :key="item.name" :body-style="{ display: 'flex', padding: 0 }">
+        <el-card
+          shadow="hover"
+          v-for="item in countData"
+          :key="item.name"
+          :body-style="{ display: 'flex', padding: 0 }"
+        >
           <i class="icon" :class="item.icon" :style="{ background: item.color }"></i>
           <div class="detail">
             <p class="num">{{ item.value }}</p>
@@ -120,6 +145,12 @@ export default {
     initClockInCountStatistics() {
       let chartDom = document.getElementById('deptCountStatistics');
       let myChart = echarts.init(chartDom);
+      this.$signalR.connectionBuilder.on('SendBaseDataStatistics', function (message) {
+        if (message && message.MessageParameter) {
+          console.log(message.MessageParameter);
+        }
+      });
+
       let option = {
         title: {
           text: '今日考勤',
