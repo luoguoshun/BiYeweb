@@ -3,13 +3,7 @@
     <el-row>
       <el-col :span="6" style="border-right: ">
         <div>
-          <el-select
-            v-model="wAType"
-            @change="checkClockIn()"
-            placeholder="考勤类别"
-            style="width: 300px; margin-bottom: 10px"
-            size="mini"
-          >
+          <el-select v-model="wAType" @change="checkClockIn()" placeholder="考勤类别" style="width: 300px; margin-bottom: 10px" size="mini">
             <el-option label="上班" value="1"></el-option>
             <el-option label="下班" value="2"></el-option>
           </el-select>
@@ -34,17 +28,9 @@
           <!-- // 缩放控件 -->
           <bm-navigation anchor="BMAP_ANCHOR_TOP_RIGHT" />
           <!-- // 地区检索 -->
-          <bm-local-search
-            :keyword="keyword"
-            :auto-viewport="true"
-            :location="location"
-          ></bm-local-search>
+          <bm-local-search :keyword="keyword" :auto-viewport="true" :location="location"></bm-local-search>
           <!-- // 红点 -->
-          <bm-marker
-            :position="{ lng: center.lng, lat: center.lat }"
-            :dragging="true"
-            animation="BMAP_ANIMATION_BOUNCE"
-          />
+          <bm-marker :position="{ lng: center.lng, lat: center.lat }" :dragging="true" animation="BMAP_ANIMATION_BOUNCE" />
           <!-- 定位 -->
           <bm-geolocation
             anchor="BMAP_ANCHOR_BOTTOM_RIGHT"
@@ -59,16 +45,9 @@
       </el-col>
       <el-col :span="18">
         <el-row class="editbar" style="margin-bottom: 10px">
-          <el-col :span="10"> <el-tag>历史纪录
-          </el-tag></el-col>
+          <el-col :span="10"> <el-tag>历史纪录 </el-tag></el-col>
           <el-col :span="7">
-            <el-date-picker
-              v-model="queryForm.publicationDates"
-              type="daterange"
-              start-placeholder="开始日期"
-              end-placeholder="结束日期"
-              size="mini"
-            >
+            <el-date-picker v-model="queryForm.publicationDates" type="daterange" start-placeholder="开始日期" end-placeholder="结束日期" size="mini">
             </el-date-picker>
           </el-col>
           <el-col :span="4">
@@ -83,19 +62,10 @@
           </el-col>
         </el-row>
         <!-- 表格 -->
-        <el-table
-          :data="table.workAttendanceList"
-          :header-cell-style="{ 'text-align': 'center' }"
-          border=""
-        >
+        <el-table :data="table.workAttendanceList" :header-cell-style="{ 'text-align': 'center' }" border="">
           <el-table-column type="selection" width="50" align="center"> </el-table-column>
           <el-table-column prop="id" label="编号" align="center"> </el-table-column>
-          <el-table-column
-            prop="employeeName"
-            label="考勤人"
-            width="150"
-            align="center"
-          ></el-table-column>
+          <el-table-column prop="employeeName" label="考勤人" width="150" align="center"></el-table-column>
           <el-table-column prop="waTypeStr" label="上班/下班" align="center"></el-table-column>
           <el-table-column prop="waMethodStr" label="考勤方式" align="center"></el-table-column>
           <el-table-column prop="waLocation" label="考勤地点" align="center"></el-table-column>
@@ -124,12 +94,7 @@
               {{ longTime(scope.row.createdTime) }}
             </template>
           </el-table-column>
-          <el-table-column
-            prop="remark"
-            label="备注"
-            align="center"
-            fixed="right"
-          ></el-table-column>
+          <el-table-column prop="remark" label="备注" align="center" fixed="right"></el-table-column>
         </el-table>
         <!-- 分页 -->
         <div class="block">
@@ -168,11 +133,10 @@ export default {
       employeeId: '',
       queryForm: {
         wAType: '',
-        WAMethod: '',
         employeeId: '',
         publicationDates: [],
         page: 1,
-        row: 10,
+        row: 20,
       },
       table: {
         workAttendanceList: [],
@@ -256,11 +220,7 @@ export default {
         this.$message({ message: '未获取您的信息', type: 'warning' });
         return;
       }
-      if (
-        !checkField(workAttendance.wALocation) ||
-        workAttendance.wALocation == 0 ||
-        workAttendance.wALocation == 0
-      ) {
+      if (!checkField(workAttendance.wALocation) || workAttendance.wALocation == 0 || workAttendance.wALocation == 0) {
         this.$message({ message: '未获取位置', type: 'warning' });
         return;
       }
@@ -275,6 +235,10 @@ export default {
         }
       });
     },
+    /**
+     * @description: 检查今日（上班/下班）是否打卡
+     * @return {*}
+     */    
     checkClockIn() {
       if (!checkField(this.wAType)) {
         this.$message({ message: '请选择考勤类别', type: 'warning' });
@@ -327,8 +291,11 @@ export default {
       }
       return 'success-row';
     },
-    //获取考勤数据
-    async getworkAttendanceList() {
+    /**
+     * @description: 获取考勤数据获取我的考勤数据
+     * @return {*}
+     */    
+    async getMyworkAttendanceList() {
       this.queryForm.employeeId = this.$store.getters['user/userInfo'].employeeId;
       await this.$api.workAttendance.getworkAttendanceList(this.queryForm).then((res) => {
         const { data, count, message } = res.data;
@@ -354,7 +321,6 @@ export default {
     resetQueryForm() {
       this.queryForm.row = 10;
       this.queryForm.page = 1;
-      this.queryForm.WAMethod = '';
       this.queryForm.wAType = '';
       this.queryForm.publicationDates = [];
       this.queryForm.conditions = '';
@@ -364,7 +330,7 @@ export default {
   created() {
     this.checkClockIn();
     this.getCurrentPosition();
-    this.getworkAttendanceList();
+    this.getMyworkAttendanceList();
     this.employeeId = this.$store.getters['user/userInfo'].employeeId;
   },
 };
