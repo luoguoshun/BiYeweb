@@ -33,9 +33,12 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.el-aside {
+  height: 100%;
+}
 .el-header {
   background-color: #ffffff;
-  // background: linear-gradient(135deg,#5efce8,#736efe);渐变色（渐变色在CSS中被定义成了 image 类型）
+  // background: linear-gradient(135deg,#5efce8,#736efe);
   padding: 8px;
   border-bottom: 1px solid #dfe4ea;
 }

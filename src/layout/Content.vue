@@ -1,12 +1,19 @@
 <!--
- * @LastEditTime: 2023-03-23 08:48:29
+ * @LastEditTime: 2023-03-28 18:18:43
  * @Descripttion: 主内容区
 -->
 <template>
   <div id="content">
     <el-tabs v-model="getDynamicTags.activeRoute" @tab-remove="removeTabHandle" @tab-click="switchComponent">
       <el-tab-pane key="home" label="首页" name="home" :closable="false"> </el-tab-pane>
-      <el-tab-pane v-for="tab in getDynamicTags.tabs" :key="tab.routeName" :label="tab.tabName" :name="tab.routeName" :closable="true"> </el-tab-pane>
+      <el-tab-pane
+        v-for="tab in getDynamicTags.tabs"
+        :key="tab.routeName"
+        :label="tab.tabName"
+        :name="tab.routeName"
+        :closable="true"
+      >
+      </el-tab-pane>
     </el-tabs>
     <el-card id="dynamic-content">
       <router-view />
@@ -63,11 +70,9 @@ export default {
     text-align: center;
   }
   #dynamic-content {
+    position: absolute; //绝对定位的参考物是：距离最近的使用了定位的父级，父级都没有使用时找body
     width: 100%;
-    min-height: 850px;
-    .el-card__body {
-      // padding:10px ;
-    }
+    // height: 100%;
   }
 }
 </style>

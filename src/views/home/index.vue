@@ -16,15 +16,11 @@
         </div>
       </el-card>
       <!-- 系统通知 -->
-      <el-card style="height: 460px; margin-top: 20px">
+      <el-card style="height: 554px; margin-top: 20px">
         <el-tabs v-model="activeName" type="card">
           <el-tab-pane label="系统通知" name="systemMessage">
             <el-collapse v-model="activeSysMessageId" accordion>
-              <el-collapse-item
-                v-for="item in systemMessageList"
-                :key="item.messageId"
-                :name="item.messageId"
-              >
+              <el-collapse-item v-for="item in systemMessageList" :key="item.messageId" :name="item.messageId">
                 <template slot="title">
                   <h4>{{ item.title }}</h4>
                 </template>
@@ -43,11 +39,7 @@
           </el-tab-pane>
           <el-tab-pane label="我的消息" name="second">
             <el-collapse v-model="activeMyMessageId" @change="readMessage" accordion>
-              <el-collapse-item
-                v-for="item in messageList"
-                :key="item.messageId"
-                :name="item.messageId"
-              >
+              <el-collapse-item v-for="item in messageList" :key="item.messageId" :name="item.messageId">
                 <template slot="title">
                   <i class="el-icon-chat-dot-round"></i>
                   <h4>{{ item.title }}</h4>
@@ -84,14 +76,17 @@
           </div>
         </el-card>
       </div>
-      <el-card shadow="hover" style="height: 350px">
-        <div id="otnerCountStatistics" :style="{ width: '550px', height: '300px' }"></div>
+      <el-card shadow="hover" style="height: 380px">
+        <div id="otnerCountStatistics" :style="{ width: '550px', height: '380px' }"></div>
       </el-card>
+      <!-- 考勤统计 -->
       <div class="graph">
         <el-card shadow="hover">
-          <div id="deptCountStatistics" :style="{ height: '300px' }"></div>
+          <div id="toWorkCountStatistics" :style="{ height: '300px' }"></div>
         </el-card>
-        <el-card shadow="hover"> </el-card>
+        <el-card shadow="hover">
+          <div id="offWorkCountStatistics" :style="{ height: '300px' }"></div>
+        </el-card>
       </div>
     </el-col>
   </el-row>
@@ -143,17 +138,76 @@ export default {
     },
     //初始化考勤信息统计
     initClockInCountStatistics() {
-      let chartDom = document.getElementById('deptCountStatistics');
+      //获取dom
+      let chartDom = document.getElementById('toWorkCountStatistics'); //上班
       let myChart = echarts.init(chartDom);
+      let chartDom1 = document.getElementById('offWorkCountStatistics'); //下班
+      let myChart1 = echarts.init(chartDom1);
+      let chartDom2 = document.getElementById('otnerCountStatistics'); //柱形图
+      let myChart2 = echarts.init(chartDom2);
+      //设置数据
+      const data = [
+        { value: 0, name: '打卡' },
+        { value: 0, name: '未打卡' },
+      ];
+      const data1 = [
+        { value: 0, name: '打卡' },
+        { value: 0, name: '未打卡' },
+      ];
+      const data2 = [
+        { product: '迟到', 上班: 0, 下班: 0 },
+        { product: '早退', 上班: 0, 下班: 0 },
+        { product: '正常', 上班: 0, 下班: 0 },
+        { product: '异常', 上班: 0, 下班: 0 },
+      ];
+      const data4 = [
+        { WATypeStr: '上班', Status: '迟到', ClockInCount: 10 },
+        { WATypeStr: '上班', Status: '早退', ClockInCount: 5 },
+        { WATypeStr: '上班', Status: '正常', ClockInCount: 10 },
+        { WATypeStr: '上班', Status: '异常', ClockInCount: 10 },
+        { WATypeStr: '下班', Status: '迟到', ClockInCount: 20 },
+        { WATypeStr: '下班', Status: '早退', ClockInCount: 10 },
+        { WATypeStr: '下班', Status: '正常', ClockInCount: 5 },
+        { WATypeStr: '下班', Status: '异常', ClockInCount: 10 },
+      ];
+      data4.forEach((item) => {
+        data2.forEach((el) => {
+          if (el.product == item.Status) {
+            if (item.WATypeStr == '上班') {
+              el.上班 = item.ClockInCount;
+            } else if (item.WATypeStr == '下班') {
+              el.下班 = item.ClockInCount;
+            }
+            return;
+          }
+        });
+      });
       this.$signalR.connectionBuilder.on('SendBaseDataStatistics', function (message) {
         if (message && message.MessageParameter) {
-          console.log(message.MessageParameter);
+          setTimeout(() => {
+            message.MessageParameter.data1.forEach((item) => {
+              if (item.WATypeStr == '上班' && item.Status == '迟到') {
+                // data2[1][]
+              }
+            });
+          }, 0);
+          setTimeout(() => {
+            message.MessageParameter.data2.forEach((item) => {
+              if (item.WATypeStr == '上班') {
+                data[0].value = item.ClockInCount;
+                data[1].value = item.UnClockInCount;
+              } else if (item.WATypeStr == '下班') {
+                data[2].value = item.ClockInCount;
+                data[3].value = item.UnClockInCount;
+              }
+            });
+          }, 0);
         }
       });
-
+      //设置选项
       let option = {
         title: {
-          text: '今日考勤',
+          text: '今日上班考勤',
           subtext: '统计',
           left: 'center',
         },
@@ -165,13 +219,7 @@ export default {
             name: 'Access From',
             type: 'pie',
             radius: '50%',
-            data: [
-              { value: 1048, name: 'Search Engine' },
-              { value: 735, name: 'Direct' },
-              { value: 580, name: 'Email' },
-              { value: 484, name: 'Union Ads' },
-              { value: 300, name: 'Video Ads' },
-            ],
+            data: data,
             emphasis: {
               itemStyle: {
                 shadowBlur: 10,
@@ -182,57 +230,48 @@ export default {
           },
         ],
       };
-      option && myChart.setOption(option);
-    },
-    initotnerCountStatistics() {
-      let chartDom = document.getElementById('otnerCountStatistics');
-      let myChart = echarts.init(chartDom);
-      let option = {
+      let option1 = {
         title: {
-          text: 'Stacked Line',
+          text: '今日下班考勤',
+          subtext: '统计',
+          left: 'center',
         },
         tooltip: {
-          trigger: 'axis',
-        },
-        legend: {
-          data: ['Email', 'Union Ads'],
-        },
-        grid: {
-          left: '3%',
-          right: '4%',
-          bottom: '3%',
-          containLabel: true,
-        },
-        toolbox: {
-          feature: {
-            saveAsImage: {},
-          },
-        },
-        xAxis: {
-          type: 'category',
-          boundaryGap: false,
-          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-        },
-        yAxis: {
-          type: 'value',
+          trigger: 'item',
         },
         series: [
           {
-            name: 'Email',
-            type: 'line',
-            stack: 'Total',
-            data: [120, 132, 101, 134, 90, 230, 210],
-          },
-          {
-            name: 'Union Ads',
-            type: 'line',
-            stack: 'Total',
-            data: [220, 182, 191, 234, 290, 330, 310],
+            name: 'Access From',
+            type: 'pie',
+            radius: '50%',
+            data: data1,
+            emphasis: {
+              itemStyle: {
+                shadowBlur: 10,
+                shadowOffsetX: 0,
+                shadowColor: 'rgba(0, 0, 0, 0.5)',
+              },
+            },
           },
         ],
       };
-      myChart.setOption(option);
+      let option2 = {
+        legend: {},
+        tooltip: {},
+        dataset: {
+          dimensions: ['product', '上班', '下班'],
+          source: data2,
+        },
+        xAxis: { type: 'category' },
+        yAxis: {},
+        series: [{ type: 'bar' }, { type: 'bar' }],
+      };
+      //挂在数据
+      option && myChart.setOption(option);
+      option1 && myChart1.setOption(option1);
+      option2 && myChart2.setOption(option2);
     },
+    initotnerCountStatistics() {},
     //获取我的消息列表
     async getMessageListByUserId() {
       await this.$api.message.getMessageListByUserId().then((res) => {
@@ -321,7 +360,6 @@ export default {
   },
   mounted() {
     this.initClockInCountStatistics();
-    this.initotnerCountStatistics();
     this.initBaseData();
   },
 };

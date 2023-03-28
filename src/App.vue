@@ -1,5 +1,5 @@
 <!--
- * @LastEditTime: 2023-03-28 09:34:58
+ * @LastEditTime: 2023-03-28 16:30:02
  * @Descripttion: 
 -->
 <template>
@@ -11,10 +11,15 @@
 <script>
 export default {
   name: 'App',
+  methods: {
+    connectionSignalR() {
+      if (this.$signalR && !this.$signalR.connectionBuilder['_connectionStarted']) {
+        this.$signalR.connectionBuilder.start();
+      }
+    },
+  },
   created() {
-    if (this.$signalR && !this.$signalR.connectionBuilder['_connectionStarted']) {
-      this.$signalR.connectionBuilder.start();
-    }
+    this.connectionSignalR();
   },
 };
 </script>

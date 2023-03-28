@@ -3,14 +3,22 @@
     <el-row>
       <el-col :span="6" style="border-right: ">
         <div>
-          <el-select v-model="wAType" @change="checkClockIn()" placeholder="考勤类别" style="width: 300px; margin-bottom: 10px" size="mini">
+          <el-select
+            v-model="wAType"
+            @change="checkClockIn()"
+            placeholder="考勤类别"
+            style="width: 300px; margin-bottom: 10px"
+            size="mini"
+          >
             <el-option label="上班" value="1"></el-option>
             <el-option label="下班" value="2"></el-option>
           </el-select>
-          <h3>
-            <el-tag type="warning">我的位置</el-tag>
-            {{ address }}
-          </h3>
+          <div style="width: 300px">
+            <p>
+              <el-tag type="warning">我的位置</el-tag>
+            </p>
+            <h3>{{ address }}</h3>
+          </div>
         </div>
         <!-- 属性说明 -->
         <!-- center：按照经纬度定位；scroll-wheel-zoom：允许滚动缩放； double-click-zoom：是否允许双击缩放-->
@@ -30,7 +38,11 @@
           <!-- // 地区检索 -->
           <bm-local-search :keyword="keyword" :auto-viewport="true" :location="location"></bm-local-search>
           <!-- // 红点 -->
-          <bm-marker :position="{ lng: center.lng, lat: center.lat }" :dragging="true" animation="BMAP_ANIMATION_BOUNCE" />
+          <bm-marker
+            :position="{ lng: center.lng, lat: center.lat }"
+            :dragging="true"
+            animation="BMAP_ANIMATION_BOUNCE"
+          />
           <!-- 定位 -->
           <bm-geolocation
             anchor="BMAP_ANCHOR_BOTTOM_RIGHT"
@@ -47,7 +59,13 @@
         <el-row class="editbar" style="margin-bottom: 10px">
           <el-col :span="10"> <el-tag>历史纪录 </el-tag></el-col>
           <el-col :span="7">
-            <el-date-picker v-model="queryForm.publicationDates" type="daterange" start-placeholder="开始日期" end-placeholder="结束日期" size="mini">
+            <el-date-picker
+              v-model="queryForm.publicationDates"
+              type="daterange"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期"
+              size="mini"
+            >
             </el-date-picker>
           </el-col>
           <el-col :span="4">
@@ -152,51 +170,49 @@ export default {
       this.getCurrentPosition();
     },
     /**
-     * @description: 双击地图触发事件
-     * @return {*}
-     * @param {*} type 事件类型
-     * @param {*} target 目标
-     * @param {*} pixel 图上像素点的坐标
-     * @param {*} point 坐标(经纬度)
-     */
-    dblclickMap({ type, target, pixel, point }) {
-      // this.center.lng = point.lng;
-      // this.center.lat = point.lat;
-      // const myGeo = new BMap.Geocoder(); // 创建地址解析器的实例
-      // myGeo.getLocation(point, (rs) => {
-      //   let adr = rs.addressComponents;
-      //   this.address = adr.province + adr.city + adr.district + adr.street + adr.streetNumber; // 省市区街道门牌号
-      //   this.infoWindowShow = true;
-      // });
-    },
-    /**
      * @description: 定位成功后触发此事件
      * @param {*} point 坐标
      * @param {*} AddressComponent
      * @param {*} marker
      */
     locationSuccessHandle({ point, AddressComponent, marker }) {
-      this.center.lng = point.lng;
-      this.center.lat = point.lat;
+      const _this = this;
+      _this.center.lng = point.lng;
+      _this.center.lat = point.lat;
+      const myGeo = new BMap.Geocoder(); // 创建地址解析器的实例
+      myGeo.getLocation(point, (rs) => {
+        let adr = rs.addressComponents;
+        this.address = adr.province + adr.city + adr.district + adr.street + adr.streetNumber; // 省市区街道门牌号
+        this.infoWindowShow = true;
+        _this.$store.commit('baiduMap/setLocation', {
+          longitude: point.lng,
+          latitude: point.lat,
+          address: this.address,
+        });
+      });
     },
     /**
-     * @description: 获取当前位置
+     * @description: 从Store获取当前位置
      */
     getCurrentPosition() {
-      const _this = this;
-      var geolocation = new BMapGL.Geolocation();
-      geolocation.getCurrentPosition(function (res) {
-        if (this.getStatus() == BMAP_STATUS_SUCCESS) {
-          const province = res.address.province;
-          const city = res.address.city;
-          const district = res.address.district;
-          const street = res.address.street;
-          const street_number = res.address.street_number;
-          _this.address = province + city + district + street + street_number;
-          _this.center.lng = res.longitude;
-          _this.center.lat = res.latitude;
-        }
-      });
+      // const _this = this;
+      // var geolocation = new BMapGL.Geolocation();
+      // geolocation.getCurrentPosition(function (res) {
+      //   if (this.getStatus() == BMAP_STATUS_SUCCESS) {
+      //     const province = res.address.province;
+      //     const city = res.address.city;
+      //     const district = res.address.district;
+      //     const street = res.address.street;
+      //     const street_number = res.address.street_number;
+      //     _this.address = province + city + district + street + street_number;
+      //     _this.center.lng = res.longitude;
+      //     _this.center.lat = res.latitude;
+      //   }
+      // });
+      this.employeeId = this.$store.getters['user/userInfo'].employeeId;
+      this.center.lng = this.$store.getters['baiduMap/longitude'];
+      this.center.lat = this.$store.getters['baiduMap/latitude'];
+      this.address = this.$store.getters['baiduMap/address'];
     },
     /**
      * @description: 打卡
@@ -238,7 +254,7 @@ export default {
     /**
      * @description: 检查今日（上班/下班）是否打卡
      * @return {*}
-     */    
+     */
     checkClockIn() {
       if (!checkField(this.wAType)) {
         this.$message({ message: '请选择考勤类别', type: 'warning' });
@@ -294,7 +310,7 @@ export default {
     /**
      * @description: 获取考勤数据获取我的考勤数据
      * @return {*}
-     */    
+     */
     async getMyworkAttendanceList() {
       this.queryForm.employeeId = this.$store.getters['user/userInfo'].employeeId;
       await this.$api.workAttendance.getworkAttendanceList(this.queryForm).then((res) => {
@@ -329,9 +345,8 @@ export default {
   },
   created() {
     this.checkClockIn();
-    this.getCurrentPosition();
+    // this.getCurrentPosition();
     this.getMyworkAttendanceList();
-    this.employeeId = this.$store.getters['user/userInfo'].employeeId;
   },
 };
 </script>

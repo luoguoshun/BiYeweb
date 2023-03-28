@@ -1,5 +1,5 @@
 <!--
- * @LastEditTime: 2023-03-28 11:08:37
+ * @LastEditTime: 2023-03-28 16:58:04
  * @Descripttion: 头部
 -->
 <template>
@@ -42,8 +42,6 @@ export default {
   },
   methods: {
     ...mapMutations({
-      clearUserInfo: 'user/clearUserInfo',
-      clearToken: 'token/clearToken',
       closeAllTags: 'lable/closeAllTags',
       collapseMenu: 'tab/collapseMenu', //控制左侧菜单是否折叠
     }),
@@ -56,7 +54,6 @@ export default {
       this.$store.commit('token/clearToken');
       this.$store.commit('user/clearUserInfo');
       this.closeAllTags();
-      this.clearToken();
       this.$router.push({ name: 'login' });
     },
     toSetting() {

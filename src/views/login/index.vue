@@ -97,10 +97,31 @@ export default {
         this.$signalR.connectionBuilder.start();
       }
     },
+    /**
+     * @description: 进入登入界面的时候就去获取地理位置
+     */    
+    getCurrentPosition() {
+      const _this = this;
+      var geolocation = new BMapGL.Geolocation();
+      geolocation.getCurrentPosition(function (res) {
+        if (this.getStatus() == BMAP_STATUS_SUCCESS) {
+          const province = res.address.province;
+          const city = res.address.city;
+          const district = res.address.district;
+          const street = res.address.street;
+          const street_number = res.address.street_number;
+          const location = {
+            longitude: res.longitude,
+            latitude: res.latitude,
+            address: province + city + district + street + street_number,
+          };
+          _this.$store.commit('baiduMap/setLocation', location);
+        }
+      });
+    },
   },
   created() {
-    localStorage.removeItem('tokenData');
-    localStorage.removeItem('routersData');
+    this.getCurrentPosition();
   },
 };
 </script>
@@ -126,7 +147,7 @@ export default {
       line-height: 70px;
       color: #747f89;
       text-align: center;
-      box-shadow: 0 2px 8px 0 rgba(99,99,99,.2);
+      box-shadow: 0 2px 8px 0 rgba(99, 99, 99, 0.2);
     }
     .login-info {
       display: flex;

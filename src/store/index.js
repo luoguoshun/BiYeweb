@@ -1,5 +1,5 @@
 /*
- * @LastEditTime: 2023-03-23 14:41:05
+ * @LastEditTime: 2023-03-28 16:40:48
  * @Descripttion: store中心
  */
 import Vue from 'vue';
@@ -39,6 +39,10 @@ const store = new Vuex.Store({
     createPersistedState({
       key: 'userData',
       paths: ['user.userInfo'],
+    }),
+    createPersistedState({
+      key: 'locationData',
+      paths: ['baiduMap'],
     }),
   ],
 });
