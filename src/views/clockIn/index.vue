@@ -28,7 +28,6 @@
           :zoom="zoom"
           @ready="handler"
           :scroll-wheel-zoom="true"
-          @dblclick="dblclickMap"
           :double-click-zoom="false"
         >
           <!-- 比例尺 -->
@@ -195,20 +194,6 @@ export default {
      * @description: 从Store获取当前位置
      */
     getCurrentPosition() {
-      // const _this = this;
-      // var geolocation = new BMapGL.Geolocation();
-      // geolocation.getCurrentPosition(function (res) {
-      //   if (this.getStatus() == BMAP_STATUS_SUCCESS) {
-      //     const province = res.address.province;
-      //     const city = res.address.city;
-      //     const district = res.address.district;
-      //     const street = res.address.street;
-      //     const street_number = res.address.street_number;
-      //     _this.address = province + city + district + street + street_number;
-      //     _this.center.lng = res.longitude;
-      //     _this.center.lat = res.latitude;
-      //   }
-      // });
       this.employeeId = this.$store.getters['user/userInfo'].employeeId;
       this.center.lng = this.$store.getters['baiduMap/longitude'];
       this.center.lat = this.$store.getters['baiduMap/latitude'];
@@ -342,6 +327,9 @@ export default {
       this.queryForm.conditions = '';
       this.loadData();
     },
+    loadData(){
+      this.getMyworkAttendanceList();
+    }
   },
   created() {
     this.checkClockIn();

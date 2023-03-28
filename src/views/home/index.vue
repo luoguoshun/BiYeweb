@@ -20,7 +20,11 @@
         <el-tabs v-model="activeName" type="card">
           <el-tab-pane label="系统通知" name="systemMessage">
             <el-collapse v-model="activeSysMessageId" accordion>
-              <el-collapse-item v-for="item in systemMessageList" :key="item.messageId" :name="item.messageId">
+              <el-collapse-item
+                v-for="item in systemMessageList"
+                :key="item.messageId"
+                :name="item.messageId"
+              >
                 <template slot="title">
                   <h4>{{ item.title }}</h4>
                 </template>
@@ -39,7 +43,11 @@
           </el-tab-pane>
           <el-tab-pane label="我的消息" name="second">
             <el-collapse v-model="activeMyMessageId" @change="readMessage" accordion>
-              <el-collapse-item v-for="item in messageList" :key="item.messageId" :name="item.messageId">
+              <el-collapse-item
+                v-for="item in messageList"
+                :key="item.messageId"
+                :name="item.messageId"
+              >
                 <template slot="title">
                   <i class="el-icon-chat-dot-round"></i>
                   <h4>{{ item.title }}</h4>
@@ -124,6 +132,20 @@ export default {
       activeSysMessageId: '',
       activeMyMessageId: '',
       activeName: 'systemMessage',
+      data1: [
+        { value: 0, name: '打卡' },
+        { value: 0, name: '未打卡' },
+      ],
+      data2: [
+        { value: 0, name: '打卡' },
+        { value: 0, name: '未打卡' },
+      ],
+      data3: [
+        { product: '迟到', 上班: 0, 下班: 0 },
+        { product: '早退', 上班: 0, 下班: 0 },
+        { product: '正常', 上班: 0, 下班: 0 },
+        { product: '异常', 上班: 0, 下班: 0 },
+      ],
     };
   },
   computed: {
@@ -136,8 +158,34 @@ export default {
         this.tableData = res.data.tableData;
       });
     },
+    /**
+     * @description: 基础数据统计
+     * @return {*}
+     */
+    initBaseData() {
+      try {
+        //改变this指向问题
+        const _this = this;
+        this.$signalR.connectionBuilder.on('SendBaseDataStatistics', function (message) {
+          if (message && message.MessageParameter) {
+            _this.countData.forEach((item) => {
+              if (item.name.indexOf('系统活跃') !== -1) {
+                item.value = message.MessageParameter.todayLoginTotal;
+              } else if (item.name.indexOf('今日打卡') !== -1) {
+                item.value = message.MessageParameter.workAttendanceCount;
+              } else if (item.name.indexOf('系统用户') !== -1) {
+                item.value = message.MessageParameter.employeeCount;
+              }
+            });
+          }
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    },
     //初始化考勤信息统计
     initClockInCountStatistics() {
+      const _this = this;
       //获取dom
       let chartDom = document.getElementById('toWorkCountStatistics'); //上班
       let myChart = echarts.init(chartDom);
@@ -146,66 +194,32 @@ export default {
       let chartDom2 = document.getElementById('otnerCountStatistics'); //柱形图
       let myChart2 = echarts.init(chartDom2);
       //设置数据
-      const data = [
-        { value: 0, name: '打卡' },
-        { value: 0, name: '未打卡' },
-      ];
-      const data1 = [
-        { value: 0, name: '打卡' },
-        { value: 0, name: '未打卡' },
-      ];
-      const data2 = [
-        { product: '迟到', 上班: 0, 下班: 0 },
-        { product: '早退', 上班: 0, 下班: 0 },
-        { product: '正常', 上班: 0, 下班: 0 },
-        { product: '异常', 上班: 0, 下班: 0 },
-      ];
-      const data4 = [
-        { WATypeStr: '上班', Status: '迟到', ClockInCount: 10 },
-        { WATypeStr: '上班', Status: '早退', ClockInCount: 5 },
-        { WATypeStr: '上班', Status: '正常', ClockInCount: 10 },
-        { WATypeStr: '上班', Status: '异常', ClockInCount: 10 },
-        { WATypeStr: '下班', Status: '迟到', ClockInCount: 20 },
-        { WATypeStr: '下班', Status: '早退', ClockInCount: 10 },
-        { WATypeStr: '下班', Status: '正常', ClockInCount: 5 },
-        { WATypeStr: '下班', Status: '异常', ClockInCount: 10 },
-      ];
-      data4.forEach((item) => {
-        data2.forEach((el) => {
-          if (el.product == item.Status) {
-            if (item.WATypeStr == '上班') {
-              el.上班 = item.ClockInCount;
-            } else if (item.WATypeStr == '下班') {
-              el.下班 = item.ClockInCount;
-            }
-            return;
-          }
-        });
-      });
-      this.$signalR.connectionBuilder.on('SendBaseDataStatistics', function (message) {
+      this.$signalR.connectionBuilder.on('SendClockInStatistics', function (message) {
         if (message && message.MessageParameter) {
-          setTimeout(() => {
-            message.MessageParameter.data1.forEach((item) => {
-              if (item.WATypeStr == '上班' && item.Status == '迟到') {
-                // data2[1][]
+          message.MessageParameter.data1.forEach((item) => {
+            _this.data3.forEach((el) => {
+              if (el.product == item.Status) {
+                if (item.WATypeStr == '上班') {
+                  el.上班 = item.ClockInCount;
+                } else if (item.WATypeStr == '下班') {
+                  el.下班 = item.ClockInCount;
+                }
+                return;
               }
             });
-          }, 0);
-          setTimeout(() => {
-            message.MessageParameter.data2.forEach((item) => {
-              if (item.WATypeStr == '上班') {
-                data[0].value = item.ClockInCount;
-                data[1].value = item.UnClockInCount;
-              } else if (item.WATypeStr == '下班') {
-                data[2].value = item.ClockInCount;
-                data[3].value = item.UnClockInCount;
-              }
-            });
-          }, 0);
+          });
+          message.MessageParameter.data2.forEach((item) => {
+            if (item.WATypeStr == '上班') {
+              _this.data1[0].value = item.ClockInCount;
+              _this.data1[1].value = item.UnClockInCount;
+            } else if (item.WATypeStr == '下班') {
+              _this.data2[0].value = item.ClockInCount;
+              _this.data2[1].value = item.UnClockInCount;
+            }
+          });
         }
       });
-      //设置选项
-      let option = {
+      myChart.setOption({
         title: {
           text: '今日上班考勤',
           subtext: '统计',
@@ -219,7 +233,7 @@ export default {
             name: 'Access From',
             type: 'pie',
             radius: '50%',
-            data: data,
+            data: _this.data1,
             emphasis: {
               itemStyle: {
                 shadowBlur: 10,
@@ -229,8 +243,9 @@ export default {
             },
           },
         ],
-      };
-      let option1 = {
+      });
+
+      myChart1.setOption({
         title: {
           text: '今日下班考勤',
           subtext: '统计',
@@ -244,7 +259,7 @@ export default {
             name: 'Access From',
             type: 'pie',
             radius: '50%',
-            data: data1,
+            data: _this.data2,
             emphasis: {
               itemStyle: {
                 shadowBlur: 10,
@@ -254,24 +269,20 @@ export default {
             },
           },
         ],
-      };
-      let option2 = {
+      });
+
+      myChart2.setOption({
         legend: {},
         tooltip: {},
         dataset: {
           dimensions: ['product', '上班', '下班'],
-          source: data2,
+          source: _this.data3,
         },
         xAxis: { type: 'category' },
         yAxis: {},
         series: [{ type: 'bar' }, { type: 'bar' }],
-      };
-      //挂在数据
-      option && myChart.setOption(option);
-      option1 && myChart1.setOption(option1);
-      option2 && myChart2.setOption(option2);
+      });
     },
-    initotnerCountStatistics() {},
     //获取我的消息列表
     async getMessageListByUserId() {
       await this.$api.message.getMessageListByUserId().then((res) => {
@@ -327,41 +338,18 @@ export default {
         }
       });
     },
-    /**
-     * @description: 基础数据统计
-     * @return {*}
-     */
-    initBaseData() {
-      try {
-        //改变this指向问题
-        const _this = this;
-        this.$signalR.connectionBuilder.on('SendDataStatistics', function (message) {
-          if (message && message.MessageParameter) {
-            _this.countData.forEach((item) => {
-              if (item.name.indexOf('系统活跃') !== -1) {
-                item.value = message.MessageParameter.todayLoginTotal;
-              } else if (item.name.indexOf('今日打卡') !== -1) {
-                item.value = message.MessageParameter.workAttendanceCount;
-              } else if (item.name.indexOf('系统用户') !== -1) {
-                item.value = message.MessageParameter.employeeCount;
-              }
-            });
-          }
-        });
-      } catch (err) {
-        console.error(err);
-      }
-    },
   },
   created() {
     this.gethomeData();
     this.getMessageListByUserId();
     this.getSystemMessageList();
-  },
-  mounted() {
-    this.initClockInCountStatistics();
+    //延迟执行 防止获取不到DOM
+    this.$nextTick(() => {
+      this.initClockInCountStatistics();
+    });
     this.initBaseData();
   },
+  mounted() {},
 };
 </script>
 

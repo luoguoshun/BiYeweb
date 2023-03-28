@@ -1,5 +1,5 @@
 <!--
- * @LastEditTime: 2023-03-28 18:18:43
+ * @LastEditTime: 2023-03-28 22:39:05
  * @Descripttion: 主内容区
 -->
 <template>
@@ -68,11 +68,6 @@ export default {
 #content {
   .el-tabs__item {
     text-align: center;
-  }
-  #dynamic-content {
-    position: absolute; //绝对定位的参考物是：距离最近的使用了定位的父级，父级都没有使用时找body
-    width: 100%;
-    // height: 100%;
   }
 }
 </style>

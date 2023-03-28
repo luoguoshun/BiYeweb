@@ -34,7 +34,8 @@ export default {
 
 <style lang="less" scoped>
 .el-aside {
-  height: 100%;
+  // height: 100%;
+  min-height: 900px;
 }
 .el-header {
   background-color: #ffffff;
