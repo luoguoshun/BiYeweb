@@ -1,3 +1,7 @@
+<!--
+ * @LastEditTime: 2023-03-28 09:34:58
+ * @Descripttion: 
+-->
 <template>
   <div id="app">
     <RouterView />
@@ -17,6 +21,8 @@ export default {
 
 <style>
 #app {
+  width: 100%;
+  height: 100%;
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

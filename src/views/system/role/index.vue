@@ -3,12 +3,8 @@
     <!-- 操作 -->
     <div class="editbar">
       <div class="edit_btn">
-        <el-button type="primary" size="mini" class="el-icon-folder-add" @click="openCreateDialog()"
-          >添加
-        </el-button>
-        <el-button type="danger" size="mini" class="el-icon-delete" @click="deleteRoleIdById()">
-          移除
-        </el-button>
+        <el-button type="primary" size="mini" class="el-icon-folder-add" @click="openCreateDialog()">添加 </el-button>
+        <el-button type="danger" size="mini" class="el-icon-delete" @click="deleteRoleIdById()"> 移除 </el-button>
         <el-upload
           class="upload"
           action=""
@@ -19,9 +15,7 @@
         >
           <el-button slot="trigger" size="mini" type="success"> 导入数据 </el-button>
         </el-upload>
-        <el-button slot="trigger" size="mini" type="warning" @click="exportRoleDataToExcel()">
-          导出数据
-        </el-button>
+        <el-button slot="trigger" size="mini" type="warning" @click="exportRoleDataToExcel()"> 导出数据 </el-button>
       </div>
     </div>
     <!-- 表格 -->
@@ -32,8 +26,7 @@
       border=""
     >
       <el-table-column type="selection" width="50" align="center"> </el-table-column>
-      <el-table-column prop="roleId" fixed label="角色编号" width="180" align="center">
-      </el-table-column>
+      <el-table-column prop="roleId" fixed label="角色编号" width="180" align="center"> </el-table-column>
       <el-table-column prop="roleName" label="角色名" width="150" align="center"></el-table-column>
       <el-table-column prop="description" label="角色描述" align="center"></el-table-column>
       <el-table-column prop="state" label="状态" align="center">
@@ -52,16 +45,10 @@
       <!-- 操作 -->
       <el-table-column fixed="right" label="编辑" width="200" align="center">
         <template slot-scope="scope">
-          <el-button
-            type="text"
-            size="small"
-            @click="openAllocationDiolog(scope.row)"
-            icon="el-icon-edit"
+          <el-button type="text" size="small" @click="openAllocationDiolog(scope.row)" icon="el-icon-edit"
             >分配权限</el-button
           >
-          <el-button type="text" size="small" @click="updateDiolog(scope.row)" icon="el-icon-edit"
-            >详细信息</el-button
-          >
+          <el-button type="text" size="small" @click="updateDiolog(scope.row)" icon="el-icon-edit">详细信息</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -82,12 +69,7 @@
           <el-input v-model="roleForm.roleName"></el-input>
         </el-form-item>
         <el-form-item label="角色描述">
-          <el-input
-            type="textarea"
-            :rows="6"
-            v-model="roleForm.description"
-            hidden="50px"
-          ></el-input>
+          <el-input type="textarea" :rows="6" v-model="roleForm.description" hidden="50px"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -145,12 +127,7 @@
           <el-input v-model="roleForm.roleName"></el-input>
         </el-form-item>
         <el-form-item label="角色描述">
-          <el-input
-            type="textarea"
-            :rows="6"
-            v-model="roleForm.description"
-            hidden="50px"
-          ></el-input>
+          <el-input type="textarea" :rows="6" v-model="roleForm.description" hidden="50px"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -198,22 +175,6 @@ export default {
     },
   },
   methods: {
-    //修改用户状态
-    updateState(row) {
-      // this.$api.employee.updateUserState(row.userId, row.state).then((res) => {
-      //   const { data, success, message } = res.data;
-      //   if (!success) {
-      //     this.$message({ message: '修改失败！', type: 'error' });
-      //   } else {
-      //     if (row.state == 1) {
-      //       this.$message({ message: '开启成功！', type: 'success' });
-      //     } else {
-      //       this.$message({ message: '禁用成功！', type: 'success' });
-      //     }
-      //     this.loadData();
-      //   }
-      // });
-    },
     //导入数据
     importRolesByExcel(param) {
       if (param.file.type != 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
@@ -226,9 +187,9 @@ export default {
         formdata.append('file', param.file);
         formdata.append('tableId', 'Role');
         this.$api.role.importRolesByExcel(formdata).then((res) => {
-          const { data, success, message } = res.data;
-          if (!success) {
-            this.$message({ message: message, type: 'error' });
+          const { data, resultType, message } = res.data;
+          if (!resultType || resultType == 2) {
+            this.$message({ message, type: 'error' });
           } else {
             this.$message({ message: message, type: 'success' });
             this.loadData();
@@ -242,8 +203,8 @@ export default {
         this.$message({ message: '请选择要导出的数据', type: 'info' });
       } else {
         this.$api.role.exportRoleDataToExcel(this.roleIds).then((res) => {
-          const { data, success, message } = res.data;
-          if (data == '') {
+          const { data, resultType, message } = res.data;
+          if (data) {
             this.$message({ message: message, type: 'error' });
           } else {
             window.open(baseUrl + data, '_self');
@@ -264,17 +225,6 @@ export default {
         }
         this.table.roleList = data;
       });
-    },
-    //获取路由树数据
-    constructRouteTreeData() {
-      // this.$api.vueRouter.constructRouteTreeData().then((res) => {
-      //   const { data, success, message } = res.data;
-      //   if (!success) {
-      //     console.log(message);
-      //     return;
-      //   }
-      //   this.permissionData = data;
-      // });
     },
     //打开添加弹窗弹窗
     openCreateDialog() {

@@ -1,15 +1,15 @@
 /*
- * @LastEditTime: 2023-03-20 17:05:33
+ * @LastEditTime: 2023-03-28 09:59:30
  * @Descripttion:
  */
 module.exports = {
   publicPath: process.env.NODE_ENV === 'production' ? '/' : '/',
   devServer: {
     open: true,
-    port: 8080, //设置端口
+    port: 8088, //设置端口
     host: 'localhost',
     proxy: {
-      // // 本地代理环境配置
+      // 本地代理环境配置
       '/baidu': {
         target: 'https://api.map.baidu.com',
         ws: true,
@@ -24,7 +24,7 @@ module.exports = {
   lintOnSave: false, //关闭ESlint校验
   chainWebpack: (config) => {
     config.plugin('html').tap((args) => {
-      args[0].title = '你的标题';
+      args[0].title = '';
       return args;
     });
   },

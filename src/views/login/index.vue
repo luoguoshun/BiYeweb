@@ -1,22 +1,29 @@
 <template>
   <div class="login">
-    <div id="container">
-      <div id="output">
-        <div class="containerT">
-          <div class="login-con">
-            <div class="info-head">
-              <h2>员工考核管理系统</h2>
-            </div>
-            <!-- 登录信息 -->
-            <div class="login-info">
-              <el-input placeholder="请输入账号" prefix-icon="el-icon-user-solid" style="width: 70%" v-model="loginInfo.account"> </el-input>
-              <el-input placeholder="请输入密码" prefix-icon="el-icon-lock" show-password style="width: 70%" v-model="loginInfo.password"> </el-input>
-              <el-button @click="login" class="btn">登 录 </el-button>
-            </div>
-            <!-- 登录信息 -->
-          </div>
-        </div>
+    <div class="login-con">
+      <div class="info-head">
+        <h2>员工考核管理系统</h2>
       </div>
+      <!-- 登录信息 -->
+      <div class="login-info">
+        <el-input
+          placeholder="请输入账号"
+          prefix-icon="el-icon-user-solid"
+          style="width: 70%"
+          v-model="loginInfo.account"
+        >
+        </el-input>
+        <el-input
+          placeholder="请输入密码"
+          prefix-icon="el-icon-lock"
+          show-password
+          style="width: 70%"
+          v-model="loginInfo.password"
+        >
+        </el-input>
+        <el-button type="primary" @click="login" class="btn">登 录 </el-button>
+      </div>
+      <!-- 登录信息 -->
     </div>
   </div>
 </template>
@@ -99,28 +106,27 @@ export default {
 </script>
 <style lang="less" scoped>
 .login {
+  position: absolute; //绝对定位的参考物是：距离最近的使用了定位的父级，父级都没有使用时找body
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: row;
-  height: 100%;
-  width: 100%;
-
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #abdcff, #0396ff);
   .login-con {
-    // margin: 15% auto 0 auto;
     display: flex;
     flex-direction: column;
     width: 500px;
-    height: 300px;
+    height: 320px;
     background-color: #ffffff;
-    border-radius: 20px;
-    box-shadow: 0 0 5px rgb(158, 158, 158);
-
+    border-radius: 15px;
     .info-head {
-      padding: 0 20px;
-      height: 50px;
-      line-height: 60px;
-      color: #44abf0;
-      background-color: #f2f6f9;
-      border-radius: 20px 20px 0 0;
+      height: 70px;
+      line-height: 70px;
+      color: #747f89;
+      text-align: center;
+      box-shadow: 0 2px 8px 0 rgba(99,99,99,.2);
     }
     .login-info {
       display: flex;
@@ -135,33 +141,12 @@ export default {
           margin-bottom: 20px;
         }
       }
-      .el-input__inner {
-        width: 100%;
-      }
-      .el-input__icon {
-        height: auto;
-      }
-      input {
-        margin: 0 0 20px 0;
-      }
       button {
         width: 70%;
-        background-color: #44abf0;
+        background: linear-gradient(135deg, #3c8ce7, #00eaff);
         color: #fff;
       }
     }
-  }
-  #container {
-    width: 100%;
-    height: 100%;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 999;
-  }
-  #output {
-    width: 100%;
-    height: 100%;
   }
   .prompt {
     width: 60%;

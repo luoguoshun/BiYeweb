@@ -1,3 +1,7 @@
+/*
+ * @LastEditTime: 2023-03-28 14:46:16
+ * @Descripttion:
+ */
 import axios from '@/utils/axios';
 export default {
   //获取系统日志列表
@@ -12,16 +16,16 @@ export default {
   },
   //获取系统日志类型列表
   getLogTypeList() {
-    return axios.post('/api/Background/Log/GetLogTypeList');
+    return axios.get('/api/Background/Log/GetLogTypeList');
   },
   //删除系统日志
   deleteLogs(logIds) {
-    return axios.post('/api/Background/Log/DeleteLogs', logIds);
+    return axios.delete(`/api/Background/Log/DeleteLogs?logIds=${logIds}`);
   },
   //导出系统日志
   exportLogs(logIds) {
     return axios.post('/api/Background/Log/ExportLogs', {
-      logIds
+      logIds,
     });
   },
   //获取操作日志列表
@@ -40,6 +44,6 @@ export default {
   },
   //删除系统操作日志
   deleteOperateRecords(operateIds) {
-    return axios.post('/api/Background/Log/DeleteOperateRecords', operateIds);
+    return axios.delete(`/api/Background/Log/DeleteOperateRecords?operateIds=${operateIds}`);
   },
 };

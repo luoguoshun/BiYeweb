@@ -106,7 +106,7 @@ ajax.interceptors.response.use(
     if (error.response) {
       // 401未登录
       if (error.response.status === 401) {
-        unauthorizedHandler();
+        // unauthorizedHandler();
       } else if (error.response.status === 403) {
         Message.warning('没有权限访问');
       } else if (error.response.status === 404) {

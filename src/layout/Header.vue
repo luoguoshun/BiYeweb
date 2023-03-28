@@ -1,3 +1,7 @@
+<!--
+ * @LastEditTime: 2023-03-28 11:08:37
+ * @Descripttion: 头部
+-->
 <template>
   <div id="header">
     <div class="l-content">
@@ -10,13 +14,12 @@
       </el-breadcrumb>
     </div>
     <div class="r-content">
-      <span>[{{ userInfo.employeeName }}]</span>
       <el-dropdown trigger="click" size="mini">
         <span class="el-dropdown-link">
           <img :src="userInfo.headerImgUrl" class="user" />
         </span>
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item>个人中心</el-dropdown-item>
+          <el-dropdown-item @click.native="toSetting">个人设置</el-dropdown-item>
           <el-dropdown-item @click.native="logOut">退出</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
@@ -56,6 +59,10 @@ export default {
       this.clearToken();
       this.$router.push({ name: 'login' });
     },
+    toSetting() {
+      this.$store.commit('lable/createTab', { tabName: '个人设置', routeName: 'userSetting' });
+      this.$router.push({ name: 'userSetting' });
+    },
   },
   created() {
     //获取路由内的全部信息
@@ -88,12 +95,6 @@ export default {
     flex-direction: row;
     text-align: center;
     justify-content: center;
-    > :first-child {
-      margin-right: 10px;
-      line-height: 40px;
-      color: #1e2732;
-      font-weight: normal;
-    }
     .user {
       width: 40px;
       height: 40px;
