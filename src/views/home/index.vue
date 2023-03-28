@@ -217,70 +217,74 @@ export default {
               _this.data2[1].value = item.UnClockInCount;
             }
           });
+
+          myChart.setOption({
+            title: {
+              text: '今日上班考勤',
+              subtext: '统计',
+              left: 'center',
+            },
+            tooltip: {
+              trigger: 'item',
+            },
+            series: [
+              {
+                name: 'Access From',
+                type: 'pie',
+                radius: '50%',
+                data: _this.data1,
+                emphasis: {
+                  itemStyle: {
+                    shadowBlur: 10,
+                    shadowOffsetX: 0,
+                    shadowColor: 'rgba(0, 0, 0, 0.5)',
+                  },
+                },
+              },
+            ],
+          });
+
+          myChart1.setOption({
+            title: {
+              text: '今日下班考勤',
+              subtext: '统计',
+              left: 'center',
+            },
+            tooltip: {
+              trigger: 'item',
+            },
+            series: [
+              {
+                name: 'Access From',
+                type: 'pie',
+                radius: '50%',
+                data: _this.data2,
+                emphasis: {
+                  itemStyle: {
+                    shadowBlur: 10,
+                    shadowOffsetX: 0,
+                    shadowColor: 'rgba(0, 0, 0, 0.5)',
+                  },
+                },
+              },
+            ],
+          });
+
+          
+          myChart2.setOption({
+            legend: {},
+            tooltip: {},
+            dataset: {
+              dimensions: ['product', '上班', '下班'],
+              source: _this.data3,
+            },
+            xAxis: { type: 'category' },
+            yAxis: {},
+            series: [{ type: 'bar' }, { type: 'bar' }],
+          });
+        
+        
         }
-      });
-      myChart.setOption({
-        title: {
-          text: '今日上班考勤',
-          subtext: '统计',
-          left: 'center',
-        },
-        tooltip: {
-          trigger: 'item',
-        },
-        series: [
-          {
-            name: 'Access From',
-            type: 'pie',
-            radius: '50%',
-            data: _this.data1,
-            emphasis: {
-              itemStyle: {
-                shadowBlur: 10,
-                shadowOffsetX: 0,
-                shadowColor: 'rgba(0, 0, 0, 0.5)',
-              },
-            },
-          },
-        ],
-      });
-
-      myChart1.setOption({
-        title: {
-          text: '今日下班考勤',
-          subtext: '统计',
-          left: 'center',
-        },
-        tooltip: {
-          trigger: 'item',
-        },
-        series: [
-          {
-            name: 'Access From',
-            type: 'pie',
-            radius: '50%',
-            data: _this.data2,
-            emphasis: {
-              itemStyle: {
-                shadowBlur: 10,
-                shadowOffsetX: 0,
-                shadowColor: 'rgba(0, 0, 0, 0.5)',
-              },
-            },
-          },
-        ],
-      });
-
-      myChart2.setOption({
-        legend: {},
-        tooltip: {},
-        dataset: {
-          dimensions: ['product', '上班', '下班'],
-          source: _this.data3,
-        },
-        xAxis: { type: 'category' },
-        yAxis: {},
-        series: [{ type: 'bar' }, { type: 'bar' }],
       });
     },
     //获取我的消息列表

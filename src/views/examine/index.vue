@@ -2,43 +2,98 @@
   <div class="wa-examine">
     <el-row class="editbar" :gutter="20">
       <el-col :span="11">
-        <el-button type="primary" size="mini" class="el-icon-folder-add" @click="handleOpenDialog({}, 'add')">新增 </el-button>
-        <el-button type="danger" size="mini" class="el-icon-delete" @click="deleteWorkById()"> 移除 </el-button>
-        <el-button type="info" size="mini" class="el-icon-question" @click="helpVisible = true"> 帮助 </el-button>
+        <el-button
+          type="primary"
+          size="mini"
+          class="el-icon-folder-add"
+          @click="handleOpenDialog({}, 'add')"
+          >新增
+        </el-button>
+        <el-button type="danger" size="mini" class="el-icon-delete" @click="deleteWorkById()">
+          移除
+        </el-button>
+        <el-button type="info" size="mini" class="el-icon-question" @click="helpVisible = true">
+          帮助
+        </el-button>
       </el-col>
       <el-col :span="5">
-        <el-date-picker size="mini" v-model="queryForm.publicationDates" type="daterange" start-placeholder="开始日期" end-placeholder="结束日期">
+        <el-date-picker
+          size="mini"
+          v-model="queryForm.publicationDates"
+          type="daterange"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+        >
         </el-date-picker>
       </el-col>
       <el-col :span="2">
-        <el-select size="mini" v-model="queryForm.employeeId" filterable placeholder="请选择员工" style="width: 300px">
-          <el-option v-for="item in userOptions" :key="item.employeeId" :label="item.employeeName" :value="item.employeeId"> </el-option>
+        <el-select
+          size="mini"
+          v-model="queryForm.employeeId"
+          filterable
+          placeholder="请选择员工"
+          style="width: 300px"
+        >
+          <el-option
+            v-for="item in userOptions"
+            :key="item.employeeId"
+            :label="item.employeeName"
+            :value="item.employeeId"
+          >
+          </el-option>
         </el-select>
       </el-col>
       <el-col :span="4">
-        <el-input v-model="queryForm.conditions" size="mini" label-width="80px" placeholder="请输入关键字"></el-input>
+        <el-input
+          v-model="queryForm.conditions"
+          size="mini"
+          label-width="80px"
+          placeholder="请输入关键字"
+        ></el-input>
       </el-col>
-      <el-col :span="1"> <el-button type="primary" @click="loadData()" size="mini">查找</el-button> </el-col>
-      <el-col :span="1"> <el-button type="primary" @click="resetQueryForm()" size="mini">重置</el-button></el-col>
+      <el-col :span="1">
+        <el-button type="primary" @click="loadData()" size="mini">查找</el-button>
+      </el-col>
+      <el-col :span="1">
+        <el-button type="primary" @click="resetQueryForm()" size="mini">重置</el-button></el-col
+      >
     </el-row>
     <!-- 表格 -->
-    <el-table :data="table.examineList" :header-cell-style="{ 'text-align': 'center' }" @selection-change="selectRows" border="">
+    <el-table
+      :data="table.examineList"
+      :header-cell-style="{ 'text-align': 'center' }"
+      @selection-change="selectRows"
+      border=""
+    >
       <el-table-column type="selection" width="50" align="center"> </el-table-column>
       <el-table-column prop="id" label="编号" align="center"> </el-table-column>
       <el-table-column prop="statusStr" label="状态" align="center">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.status==2">{{ scope.row.statusStr }}</el-tag>
-          <el-tag type="warning" v-if="scope.row.status==4">{{ scope.row.statusStr }}</el-tag>
+          <el-tag v-if="scope.row.status == 2">{{ scope.row.statusStr }}</el-tag>
+          <el-tag type="warning" v-if="scope.row.status == 4">{{ scope.row.statusStr }}</el-tag>
           <!-- <el-tag type="danger">标签五</el-tag> -->
         </template>
       </el-table-column>
-      <el-table-column prop="employeeName" label="员工" width="150" align="center"></el-table-column>
+      <el-table-column
+        prop="employeeName"
+        label="员工"
+        width="150"
+        align="center"
+      ></el-table-column>
       <el-table-column prop="departmentName" label="部门" align="center"></el-table-column>
       <el-table-column prop="startTime" label="开始考核时间" align="center"></el-table-column>
       <el-table-column prop="endTime" label="结束考核时间" align="center"></el-table-column>
       <el-table-column prop="examineUserName" label="考核人" align="center"></el-table-column>
-      <el-table-column prop="workCompletionPercentage" label="工作完成百分比" align="center"></el-table-column>
-      <el-table-column prop="workAttendancePercentage" label="考勤完成百分比" align="center"></el-table-column>
+      <el-table-column
+        prop="workCompletionPercentage"
+        label="工作完成百分比"
+        align="center"
+      ></el-table-column>
+      <el-table-column
+        prop="workAttendancePercentage"
+        label="考勤完成百分比"
+        align="center"
+      ></el-table-column>
       <el-table-column prop="toBeCompleted" label="待完成事项" align="center"> </el-table-column>
       <el-table-column prop="isQualified" label="是否合格" align="center">
         <template slot-scope="scope">
@@ -53,12 +108,40 @@
       <!-- 操作 -->
       <el-table-column fixed="right" label="编辑" width="200" align="center">
         <template slot-scope="scope">
-          <el-button size="mini" type="primary" v-if="scope.row.status == 1" @click="(e) => updateExamineStatus(scope.row, 2)">提交</el-button>
-          <el-button size="mini" type="danger" v-if="scope.row.status == 2" @click="(e) => updateExamineStatus(scope.row, 3)">撤销</el-button>
-          <el-button size="mini" type="warning" v-if="scope.row.status == 2" @click="(e) => updateExamineStatus(scope.row, 4)">生效</el-button>
-          <el-button size="mini" type="success" v-if="scope.row.status == 3" disabled>已撤销</el-button>
-          <el-button size="mini" type="success" v-if="scope.row.status == 4" disabled>已生效</el-button>
-          <el-button type="text" size="small" @click="handleOpenDialog(scope.row, 'detail')" icon="el-icon-edit">考核详情</el-button>
+          <el-button
+            size="mini"
+            type="primary"
+            v-if="scope.row.status == 1"
+            @click="(e) => updateExamineStatus(scope.row, 2)"
+            >提交</el-button
+          >
+          <el-button
+            size="mini"
+            type="danger"
+            v-if="scope.row.status == 2"
+            @click="(e) => updateExamineStatus(scope.row, 3)"
+            >撤销</el-button
+          >
+          <el-button
+            size="mini"
+            type="warning"
+            v-if="scope.row.status == 2"
+            @click="(e) => updateExamineStatus(scope.row, 4)"
+            >生效</el-button
+          >
+          <el-button size="mini" type="success" v-if="scope.row.status == 3" disabled
+            >已撤销</el-button
+          >
+          <el-button size="mini" type="success" v-if="scope.row.status == 4" disabled
+            >已生效</el-button
+          >
+          <el-button
+            type="text"
+            size="small"
+            @click="handleOpenDialog(scope.row, 'detail')"
+            icon="el-icon-edit"
+            >考核详情</el-button
+          >
         </template>
       </el-table-column>
     </el-table>
@@ -77,18 +160,47 @@
       </el-pagination>
     </div>
     <!-- 新建考核 -->
-    <el-dialog title="新建考核" center :visible.sync="addVisible" :close-on-click-modal="false" width="50%">
+    <el-dialog
+      title="新建考核"
+      center
+      :visible.sync="addVisible"
+      :close-on-click-modal="false"
+      width="50%"
+    >
       <el-form ref="createform" :model="examine" label-width="100px">
         <el-form-item label="员工" required>
-          <el-select v-model="examine.employeeId" filterable placeholder="请选择" style="width: 300px">
-            <el-option v-for="item in userOptions" :key="item.employeeId" :label="item.employeeName" :value="item.employeeId"> </el-option>
+          <el-select
+            v-model="examine.employeeId"
+            filterable
+            placeholder="请选择"
+            style="width: 300px"
+          >
+            <el-option
+              v-for="item in userOptions"
+              :key="item.employeeId"
+              :label="item.employeeName"
+              :value="item.employeeId"
+            >
+            </el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="考勤月份" required>
-          <el-date-picker v-model="examine.month" type="month" placeholder="选择月" style="width: 300px"> </el-date-picker>
+          <el-date-picker
+            v-model="examine.month"
+            type="month"
+            placeholder="选择月"
+            style="width: 300px"
+          >
+          </el-date-picker>
         </el-form-item>
         <el-form-item label="备注">
-          <el-input type="textarea" :rows="6" v-model="examine.remark" hidden="50px" :autosize="{ minRows: 2, maxRows: 6 }"></el-input>
+          <el-input
+            type="textarea"
+            :rows="6"
+            v-model="examine.remark"
+            hidden="50px"
+            :autosize="{ minRows: 2, maxRows: 6 }"
+          ></el-input>
         </el-form-item>
         <el-form-item label="等级">
           <el-input type="text" v-model="examine.examineLevel" disabled></el-input>
@@ -122,19 +234,51 @@
       </div>
     </el-dialog>
     <!-- 考核详情 -->
-    <el-dialog title="考核详情" center :visible.sync="editVisible" :close-on-click-modal="false" width="50%">
+    <el-dialog
+      title="考核详情"
+      center
+      :visible.sync="editVisible"
+      :close-on-click-modal="false"
+      width="50%"
+    >
       <el-form ref="detailform" :model="examine" label-width="80px">
         <el-form-item label="员工" required>
-          <el-select v-model="examine.employeeId" filterable placeholder="请选择" style="width: 300px" disabled>
-            <el-option v-for="item in userOptions" :key="item.employeeId" :label="item.employeeName" :value="item.employeeId"> </el-option>
+          <el-select
+            v-model="examine.employeeId"
+            filterable
+            placeholder="请选择"
+            style="width: 300px"
+            disabled
+          >
+            <el-option
+              v-for="item in userOptions"
+              :key="item.employeeId"
+              :label="item.employeeName"
+              :value="item.employeeId"
+            >
+            </el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="考勤月份" required>
-          <el-date-picker v-model="examine.month" type="month" value-format="yyyy-MM" placeholder="选择月" style="width: 300px" disabled>
+          <el-date-picker
+            v-model="examine.month"
+            type="month"
+            value-format="yyyy-MM"
+            placeholder="选择月"
+            style="width: 300px"
+            disabled
+          >
           </el-date-picker>
         </el-form-item>
         <el-form-item label="备注">
-          <el-input type="textarea" :rows="6" v-model="examine.remark" hidden="50px" :autosize="{ minRows: 2, maxRows: 6 }" disabled></el-input>
+          <el-input
+            type="textarea"
+            :rows="6"
+            v-model="examine.remark"
+            hidden="50px"
+            :autosize="{ minRows: 2, maxRows: 6 }"
+            disabled
+          ></el-input>
         </el-form-item>
         <el-form-item label="等级">
           <el-input type="text" v-model="examine.examineLevel" disabled></el-input>
@@ -426,6 +570,22 @@ export default {
           type: 'warning',
         });
       } else {
+        let IsOk = true;
+        this.examineIds.forEach((el) => {
+          if (!IsOk) {
+            return;
+          }
+          this.table.examineList.forEach((item) => {
+            if (item.id == el && item.status == 4) {
+              IsOk = false;
+              return;
+            }
+          });
+        });
+        // if (!IsOk) {
+        //   this.$message.error('不可删除已经生效的考核单');
+        //   return;
+        // }
         this.$api.examine.deleteWorkById(this.examineIds).then((res) => {
           let { data, message } = res.data;
           if (!data) {

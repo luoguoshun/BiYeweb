@@ -140,11 +140,11 @@ export default {
         });
       } else {
         this.$api.log.exportOperateRecords(this.operateIds).then((res) => {
-          let { success, message } = res.data;
-          if (!success) {
-            this.$message.error(message);
+          const { data, resultType, message } = res.data;
+          if (!resultType || resultType == 2) {
+            this.$message({ message: message, type: 'error' });
           } else {
-            window.open(baseUrl + message, '_self');
+            window.open(baseUrl + data, '_self');
           }
         });
       }

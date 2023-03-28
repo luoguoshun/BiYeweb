@@ -38,6 +38,6 @@ export default {
    * @param {*} ids
    */  
   deleteWorkById(ids){
-    return axios.delete(`/api/Background/Examine/deleteWorkById?ids=${ids}`);
+    return axios.post(`/api/Background/Examine/deleteWorkById?`,ids);
   }
 };
