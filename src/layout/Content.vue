@@ -1,5 +1,5 @@
 <!--
- * @LastEditTime: 2023-03-29 08:41:52
+ * @LastEditTime: 2023-03-29 08:43:59
  * @Descripttion: 主内容区
 -->
 <template>
@@ -68,8 +68,6 @@ export default {
 #content {
   .el-tabs__item {
     text-align: center;
-  }
-  #dynamic-content {
   }
 }
 </style>
