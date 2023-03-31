@@ -1,3 +1,7 @@
+/*
+ * @LastEditTime: 2023-03-31 15:49:55
+ * @Descripttion: 
+ */
 import axios from '@/utils/axios';
 export default {
   //获取用户列表
@@ -36,7 +40,7 @@ export default {
       status,
     });
   },
-  //修改用户状态
+  //新建用户
   addUser(userForm) {
     return axios.post('/api/Background/Employee/AddUser', {
       ...userForm,

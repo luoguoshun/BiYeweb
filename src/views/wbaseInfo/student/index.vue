@@ -1,38 +1,43 @@
 <template>
   <div class="user_container">
     <!-- 操作 -->
-    <div class="editbar">
-      <div class="edit_btn">
-        <el-button type="primary" size="mini" class="el-icon-folder-add" @click="openAddDialog()">添加 </el-button>
-        <el-button type="danger" size="mini" class="el-icon-delete" @click="deleteUsers()"> 移除 </el-button>
-      </div>
-      <div class="edit_query">
-        <el-select size="mini" v-model="queryForm.roleId" placeholder="请选择角色类别">
-          <el-option v-for="item in roleTypes" :key="item.roleId" :label="item.roleName" :value="item.roleId"></el-option>
+    <el-row class="edit_query">
+      <el-col :span="4">
+        <el-select v-model="value" clearable placeholder="请选择宿舍楼">
+          <el-option value="A1" label="A1"></el-option>
+          <el-option value="A2" label="A2"></el-option>
+          <el-option value="A3" label="A3"></el-option>
         </el-select>
-        <el-input v-model="queryForm.conditions" size="mini" label-width="80px" placeholder="请输入"></el-input>
-        <el-button type="primary" @click="loadData()" size="mini">查找</el-button>
-        <el-button type="primary" @click="resetQueryForm()" size="mini">重置</el-button>
-      </div>
-    </div>
+      </el-col>
+      <el-col :span="6">
+        <el-input placeholder="请输入学号/姓名" v-model="queryForm.conditions" clearable> </el-input>
+      </el-col>
+      <el-col :span="3">
+        <el-button type="primary" icon="el-icon-search" @click="loadData()" size="small">查找</el-button>
+        <el-button icon="el-icon-refresh" @click="resetQueryForm()" size="small">重置</el-button>
+      </el-col>
+    </el-row>
+    <el-row class="edit_operate">
+      <el-button type="primary" size="small" plain>主要按钮</el-button>
+      <el-button type="success" size="small" plain>成功按钮</el-button>
+      <el-button type="info" size="small" plain>信息按钮</el-button>
+      <el-button type="warning" size="small" plain>警告按钮</el-button>
+      <el-button type="danger" size="small" plain>危险按钮</el-button>
+    </el-row>
     <!-- 表格 -->
-    <el-table
-      :data="table.userList"
-      @row-dblclick="openUpdateDiolog"
-      :header-cell-style="{ 'text-align': 'center' }"
-      @selection-change="selectRows"
-      border=""
-    >
-      <el-table-column type="selection" width="40" align="center"> </el-table-column>
-      <el-table-column fixed prop="employeeId" label="编号" width="120px" align="center"> </el-table-column>
+    <el-table :data="table.studentList" @row-dblclick="handleEdit" :header-cell-style="{ 'text-align': 'center' }"
+      @selection-change="selectRows" border="">
+      <!-- <el-table-column type="selection" width="40" align="center"> </el-table-column> -->
+      <el-table-column fixed prop="studentId" label="编号" width="120px" align="center"> </el-table-column>
       <el-table-column label="证件照" width="100" align="center">
         <template slot-scope="scope">
-          <el-image style="width: 60px; height: 50px" :src="scope.row.headerImgUrl" :preview-src-list="[scope.row.headerImgUrl]"></el-image>
+          <el-image style="width: 60px; height: 50px" :src="scope.row.headerImgUrl"
+            :preview-src-list="[scope.row.headerImgUrl]"></el-image>
         </template>
       </el-table-column>
-      <el-table-column label="职工名" width="100px" align="center">
+      <el-table-column label="学生名" width="100px" align="center">
         <template slot-scope="scope">
-          <el-tag disable-transitions>{{ scope.row.employeeName }}</el-tag>
+          <el-tag disable-transitions>{{ scope.row.name }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="sex" label="性别" width="60px" align="center">
@@ -41,85 +46,71 @@
           <span v-else-if="scope.row.sex == 2"> 女 </span>
         </template>
       </el-table-column>
-      <!-- <el-table-column prop="idNumber" label="身份证号码"  align="center"> </el-table-column> -->
-      <el-table-column prop="departmentName" label="部门名称" align="center"> </el-table-column>
+      <el-table-column prop="speciality" label="专业" align="center"> </el-table-column>
+      <el-table-column prop="dormitoryId" label="宿舍楼" align="center"> </el-table-column>
+      <el-table-column prop="dormitoryRoomId" label="宿舍号" align="center"> </el-table-column>
       <el-table-column prop="address" label="住址" align="center"> </el-table-column>
       <el-table-column prop="phone" label="联系方式" align="center"> </el-table-column>
-      <el-table-column label="角色" align="center">
-        <template slot-scope="scope">
-          {{ scope.row.roleNames }}
-        </template>
-      </el-table-column>
       <el-table-column label="创建时间" align="center">
         <template slot-scope="scope">
           {{ leaveTime(scope.row.createTime) }}
-          <!-- {{ scope.row.createTime }} -->
         </template>
       </el-table-column>
       <el-table-column prop="state" label="状态" align="center">
         <template slot-scope="scope">
-          <el-switch
-            class="switch"
-            :inactive-value="0"
-            :active-value="1"
-            active-color="rgb(0, 255, 149)"
-            inactive-color="rgb(151, 148, 148)"
-            v-model="scope.row.status"
-            @change="updateUserState(scope.row)"
-          />
+          <el-switch class="switch" :inactive-value="0" :active-value="1" active-color="rgb(0, 255, 149)"
+            inactive-color="rgb(151, 148, 148)" v-model="scope.row.status" @change="updateUserState(scope.row)" />
         </template>
       </el-table-column>
       <el-table-column prop="noteSrc" label="简历" align="center" width="200px">
         <template slot-scope="scope">
-          <el-button v-if="scope.row.noteSrc == null || scope.row.noteSrc == ''" type="primary" @click="openuploadNoteDialog(scope.row)" size="mini">
+          <el-button v-if="scope.row.noteSrc == null || scope.row.noteSrc == ''" type="primary"
+            @click="openuploadNoteDialog(scope.row)" size="mini">
             上传简历
           </el-button>
           <el-button v-else type="primary" @click="openuploadNoteDialog(scope.row)" size="mini"> 重新上传 </el-button>
-          <el-button v-if="scope.row.noteSrc !== '' && scope.row.noteSrc != null" type="primary" @click="notePreview(scope.row)" size="mini">
+          <el-button v-if="scope.row.noteSrc !== '' && scope.row.noteSrc != null" type="primary"
+            @click="notePreview(scope.row)" size="mini">
             预览
           </el-button>
         </template>
       </el-table-column>
       <el-table-column fixed="right" label="操作" align="center">
         <template slot-scope="scope">
-          <el-button type="primary" size="small" @click="openUpdateDiolog(scope.row)">查看</el-button>
+          <el-button size="mini" @click="handleEdit(scope.$index, scope.row)">修改</el-button>
+          <el-button size="mini" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
     <!-- 分页 -->
     <div class="block">
-      <el-pagination
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        :total="table.total"
-        :page-sizes="[5, 10, 15, 20]"
-        :current-page="queryForm.page"
-        :page-size="queryForm.row"
-        layout="total, sizes, prev, pager, next, jumper"
-        background
-      >
+      <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :total="table.total"
+        :page-sizes="[5, 10, 15, 20]" :current-page="queryForm.page" :page-size="queryForm.row"
+        layout="total, sizes, prev, pager, next, jumper" background>
       </el-pagination>
     </div>
-    <!-- 修改职工信息对话框 -->
-    <el-dialog title="职工信息" center :visible.sync="dialogObject.updateVisible" :close-on-click-modal="false" width="50%">
-      <el-form ref="updateform" :model="userForm" label-width="80px">
+    <!-- 修改学生信息对话框 -->
+    <el-dialog title="学生信息" center :visible.sync="dialogObject.updateVisible" :close-on-click-modal="false" width="50%">
+      <el-form ref="updateform" :model="studentForm" label-width="80px">
         <el-form-item label="证件照">
-          <img :src="userForm.headerImgUrl" width="100" height="100" />
+          <img :src="studentForm.headerImgUrl" width="100" height="100" />
           <el-upload ref="upload" action="" :http-request="uploadUserHeaderImg" :auto-upload="false" :limit="1">
             <el-button slot="trigger" size="small" type="primary"> 选取文件 </el-button>
-            <el-button style="margin-left: 10px" size="small" type="success" @click="$refs.upload.submit()">上传到服务器</el-button>
+            <el-button style="margin-left: 10px" size="small" type="success"
+              @click="$refs.upload.submit()">上传到服务器</el-button>
           </el-upload>
         </el-form-item>
-        <el-form-item label="职工名称"> <el-input v-model="userForm.employeeName"></el-input> </el-form-item>
+        <el-form-item label="学生名称"> <el-input v-model="studentForm.name"></el-input> </el-form-item>
         <el-form-item label="性别">
-          <el-radio-group v-model="userForm.sex" size="mini">
+          <el-radio-group v-model="studentForm.sex" size="mini">
             <el-radio :label="1">男</el-radio>
             <el-radio :label="2">女</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="部门">
-          <el-select v-model="userForm.departmentId" filterable placeholder="请选择部门">
-            <el-option v-for="item in departmentList" :key="item.departmentId" :label="item.departmentName" :value="item.departmentId"></el-option>
+          <el-select v-model="studentForm.departmentId" filterable placeholder="请选择部门">
+            <el-option v-for="item in departmentList" :key="item.departmentId" :label="item.departmentName"
+              :value="item.departmentId"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="角色">
@@ -130,48 +121,49 @@
           </el-checkbox-group>
         </el-form-item>
         <el-form-item label="联系方式">
-          <el-input type="text" v-model="userForm.phone"></el-input>
+          <el-input type="text" v-model="studentForm.phone"></el-input>
         </el-form-item>
         <!-- <el-form-item label="省区">
           <el-cascader size="large" :options="options" v-model="selectedOptions" @change="handleChange"> </el-cascader>
         </el-form-item> -->
         <el-form-item label="地址">
-          <el-input type="text" v-model="userForm.address"></el-input>
+          <el-input type="text" v-model="studentForm.address"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogObject.updateVisible = false">取 消</el-button>
-        <el-button type="success" @click="updateUserInfo()">修 改</el-button>
+        <el-button type="success" @click="update()">修 改</el-button>
       </div>
     </el-dialog>
-    <!-- 添加职工信息对话框 -->
-    <el-dialog title="职工信息" center :visible.sync="dialogObject.addVisible" :close-on-click-modal="false" width="50%">
-      <el-form :model="userForm" :rules="rules" ref="userForm" label-width="80px">
-        <el-form-item label="职工Id" prop="employeeId">
-          <el-input v-model="userForm.employeeId"></el-input>
+    <!-- 添加学生信息对话框 -->
+    <el-dialog title="学生信息" center :visible.sync="dialogObject.addVisible" :close-on-click-modal="false" width="50%">
+      <el-form :model="studentForm" :rules="rules" ref="studentForm" label-width="80px">
+        <el-form-item label="学生Id" prop="studentId">
+          <el-input v-model="studentForm.studentId"></el-input>
         </el-form-item>
-        <el-form-item label="职工名" prop="employeeName">
-          <el-input v-model="userForm.employeeName"></el-input>
+        <el-form-item label="学生名" prop="name">
+          <el-input v-model="studentForm.name"></el-input>
         </el-form-item>
         <el-form-item label="性别">
-          <el-radio-group v-model="userForm.sex" size="mini">
+          <el-radio-group v-model="studentForm.sex" size="mini">
             <el-radio :label="1">男</el-radio>
             <el-radio :label="2">女</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item label="部门">
-          <el-select v-model="userForm.departmentId" filterable placeholder="请选择部门">
-            <el-option v-for="item in departmentList" :key="item.departmentId" :label="item.departmentName" :value="item.departmentId"></el-option>
+          <el-select v-model="studentForm.departmentId" filterable placeholder="请选择部门">
+            <el-option v-for="item in departmentList" :key="item.departmentId" :label="item.departmentName"
+              :value="item.departmentId"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="联系方式" prop="phone">
-          <el-input type="text" v-model="userForm.phone"></el-input>
+          <el-input type="text" v-model="studentForm.phone"></el-input>
         </el-form-item>
         <!-- <el-form-item label="省区">
           <el-cascader size="large" :options="options" v-model="selectedOptions" @change="handleChange"> </el-cascader>
         </el-form-item> -->
         <el-form-item label="地址">
-          <el-input type="text" v-model="userForm.address"></el-input>
+          <el-input type="text" v-model="studentForm.address"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -180,14 +172,15 @@
       </div>
     </el-dialog>
     <!-- 简历上传 -->
-    <el-dialog title="简历上传" center :visible.sync="dialogObject.uploadNoteVisible" :close-on-click-modal="false" width="30%">
+    <el-dialog title="简历上传" center :visible.sync="dialogObject.uploadNoteVisible" :close-on-click-modal="false"
+      width="30%">
       <el-upload class="upload-demo" drag action="" :http-request="uploadUserNote" :file-list="noteFileList">
         <i class="el-icon-upload"></i>
         <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
         <div class="el-upload__tip" slot="tip">只能上传jpg/png文件，且不超过500kb</div>
-      </el-upload></el-dialog
-    >
-    <el-dialog title="简历预览" center :visible.sync="dialogObject.notepreviewVisible" :close-on-click-modal="false" width="60%">
+      </el-upload></el-dialog>
+    <el-dialog title="简历预览" center :visible.sync="dialogObject.notepreviewVisible" :close-on-click-modal="false"
+      width="60%">
       <pdf ref="pdf" v-for="i in numPages" :key="i" :src="noteSrc" :page="i"></pdf>
     </el-dialog>
   </div>
@@ -195,11 +188,7 @@
 
 <script>
 import { leaveTime } from '@/utils/timeFormat';
-import pdf from 'vue-pdf';
 export default {
-  components: {
-    pdf,
-  },
   data() {
     // 验证手机号的规则
     const cheackMobile = (rule, value, callback) => {
@@ -233,18 +222,18 @@ export default {
         callback('身份证格式有误');
       }
     };
-    //检查职工编号是否存在
+    //检查学生编号是否存在
     const cheackUserId = (rule, value, callback) => {
       const regUserId = /^[A-Za-z0-9]+$/;
       if (!regUserId.test(value)) {
-        return callback(new Error('职工id由英文和数字组成!'));
+        return callback(new Error('学生id由英文和数字组成!'));
       } else {
-        this.$api.employee.checkUserExists(value).then((res) => {
+        this.$api.student.checkUserExists(value).then((res) => {
           const { data, success, message } = res.data;
           if (success) {
             return callback();
           }
-          callback(new Error('职工Id重复!'));
+          callback(new Error('学生Id重复!'));
         });
       }
     };
@@ -256,7 +245,7 @@ export default {
         roleId: '',
       },
       table: {
-        userList: [],
+        studentList: [],
         total: 0,
       },
       dialogObject: {
@@ -265,9 +254,9 @@ export default {
         uploadNoteVisible: false,
         notepreviewVisible: false,
       },
-      userForm: {
-        employeeId: '',
-        employeeName: '',
+      studentForm: {
+        studentId: '',
+        name: '',
         headerImgUrl: '',
         sex: 1,
         IdNumber: '',
@@ -279,10 +268,9 @@ export default {
         areadata: '',
       },
       roleIds: [],
-      userIds: [],
       roleTypes: [],
       rules: {
-        employeeName: [
+        name: [
           //^[\u4e00-\u9fa5]{0,}$ 纯汉字
           { required: true, message: '姓名', trigger: 'blur' },
           { min: 2, max: 8, message: '长度在 2到 8 个字符', trigger: 'blur' },
@@ -295,8 +283,8 @@ export default {
           { required: true, message: '身份证不能为空', trigger: 'blur' },
           { validator: cheackIdNumber, trigger: 'blur' },
         ],
-        employeeId: [
-          { required: true, message: '职工Id不能为空', trigger: 'change' },
+        studentId: [
+          { required: true, message: '学生Id不能为空', trigger: 'change' },
           { min: 3, max: 16, message: '长度在 3 到 16 个字符', trigger: 'blur' },
           { validator: cheackUserId, trigger: 'blur' },
         ],
@@ -304,7 +292,6 @@ export default {
       departmentList: [],
       options: [],
       selectedOptions: [],
-      // provinceAndCity,
       search: { current: 1, size: 6 },
       noteFileList: [],
       numPages: '', //pdf总页数
@@ -336,18 +323,20 @@ export default {
       }
     },
     loadData() {
-      this.getUserList();
+      this.getStudentList();
     },
-    //获取职工数据
-    async getUserList() {
-      await this.$api.employee.getUserList(this.queryForm.page, this.queryForm.row, this.queryForm.conditions, this.queryForm.roleId).then((res) => {
-        const { data, count } = res.data;
-        if (data) {
-          this.table.userList = data;
-          this.table.total = count;
-        }
-        console.log(data);
-      });
+    //获取学生数据
+    async getStudentList() {
+      await this.$api.student
+        .getStudentList(this.queryForm.page, this.queryForm.row, this.queryForm.conditions, this.queryForm.roleId)
+        .then((res) => {
+          const { data, count } = res.data;
+          if (data) {
+            this.table.studentList = data;
+            this.table.total = count;
+          }
+          console.log(data);
+        });
     },
     //重置搜索条件
     resetQueryForm() {
@@ -365,60 +354,32 @@ export default {
       this.queryForm.page = page;
       this.loadData();
     },
-    //获取选中行的数据
-    selectRows(selection) {
-      this.userIds = [];
-      selection.forEach((element) => {
-        this.userIds.push(element.employeeId);
-      });
-    },
-    //删除职工
-    deleteUsers() {
-      if (this.userIds.length == 0) {
-        this.$message({
-          message: '请选择要删除的数据',
-          type: 'warning',
-        });
-      } else {
-        this.$api.employee.deleteUsersById(this.userIds).then((res) => {
-          let { data,success, message } = res.data;
-          if (!data) {
-            console.log(message);
-            this.$message.error('删除失败！');
-          } else {
-            this.$message({ message: '删除成功！', type: 'success' });
-            this.loadData();
-          }
-        });
-      }
-    },
     //打开添加弹窗
     openAddDialog() {
       this.dialogObject.addVisible = true;
-      this.userForm.employeeId = '';
-      this.userForm.employeeName = '';
-      this.userForm.sex = 1;
-      this.userForm.address = '';
-      this.userForm.phone = '';
-      this.roleIds = [];
-      this.userForm.departmentId = '';
+      this.studentForm.studentId = '';
+      this.studentForm.name = '';
+      this.studentForm.sex = 1;
+      this.studentForm.address = '';
+      this.studentForm.phone = '';
+      this.studentForm.departmentId = '';
     },
-    //添加新职工
-    addUser() {
-      this.$refs['userForm'].validate((valid) => {
+    //添加新学生
+    add() {
+      this.$refs['studentForm'].validate((valid) => {
         if (valid) {
-          const user = {
-            employeeId: this.userForm.employeeId,
-            employeeName: this.userForm.employeeName,
-            sex: this.userForm.sex,
-            address: this.userForm.address,
-            phone: this.userForm.phone,
+          const Student = {
+            studentId: this.studentForm.studentId,
+            name: this.studentForm.name,
+            sex: this.studentForm.sex,
+            address: this.studentForm.address,
+            phone: this.studentForm.phone,
             roleIds: this.roleIds,
-            departmentId: this.userForm.departmentId,
+            departmentId: this.studentForm.departmentId,
           };
-          this.$api.employee.addUser(user).then((res) => {
-            const { data, success, message } = res.data;
-            if (!data) {
+          this.$api.student.add(Student).then((res) => {
+            const { data, message, resultType } = res.data;
+            if (!resultType || resultType == 2) {
               this.$message({ message, type: 'error' });
               return;
             }
@@ -432,9 +393,14 @@ export default {
         }
       });
     },
-    //上传职工头像
+    //上传学生头像
     uploadUserHeaderImg(param) {
-      if (param.file.type != 'image/png' && param.file.type != 'image/gif' && param.file.type != 'image/jpg' && param.file.type != 'image/jpeg') {
+      if (
+        param.file.type != 'image/png' &&
+        param.file.type != 'image/gif' &&
+        param.file.type != 'image/jpg' &&
+        param.file.type != 'image/jpeg'
+      ) {
         this.$notify.warning({
           title: '警告',
           message: '请上传格式为.png .gif .jpg .jpeg的图片',
@@ -448,10 +414,10 @@ export default {
         //创建FormData对象(键值对集合) 将模型存在FormData中
         const formdata = new FormData();
         formdata.append('file', param.file);
-        formdata.append('employeeId', this.userForm.employeeId);
-        this.$api.employee.uploadUserHeadImg(formdata).then((res) => {
-          const { data, message } = res.data;
-          if (!data) {
+        formdata.append('studentId', this.studentForm.studentId);
+        this.$api.student.uploadUserHeadImg(formdata).then((res) => {
+          const { data, message, resultType } = res.data;
+          if (!resultType || resultType == 2) {
             this.$message({ message: message, type: 'error' });
             return;
           } else {
@@ -463,27 +429,33 @@ export default {
       }
     },
     //打开修改弹窗
-    openUpdateDiolog(row) {
-      this.userForm = { ...row };
-      if (this.userForm.roleIds) {
-        this.roleIds = this.userForm.roleIds.split('、');
-      } else {
-        this.roleIds = [];
-      }
+    handleEdit(row) {
       this.dialogObject.updateVisible = true;
     },
-    //修改职工数据
-    updateUserInfo() {
-      const user = {
-        employeeId: this.userForm.employeeId,
-        roleIds: this.roleIds,
-        phone: this.userForm.phone,
-        address: this.userForm.address,
-        sex: this.userForm.sex,
-        employeeName: this.userForm.employeeName,
-        departmentId: this.userForm.departmentId,
+    handleDelete(row) {
+      this.$api.student.delete(row.studentId).then((res) => {
+        const { data, message, resultType } = res.data;
+        if (!resultType || resultType == 2) {
+          this.$message({ message, type: 'error' });
+        } else {
+          this.$message({ message: ' 删除成功！', type: 'success' });
+          this.dialogObject.updateVisible = false;
+          this.loadData();
+        }
+      });
+    },
+    //修改学生数据
+    update() {
+      const Student = {
+        studentId: this.studentForm.studentId,
+
+        phone: this.studentForm.phone,
+        address: this.studentForm.address,
+        sex: this.studentForm.sex,
+        name: this.studentForm.name,
+        departmentId: this.studentForm.departmentId,
       };
-      this.$api.employee.updateUser(user).then((res) => {
+      this.$api.student.delete(Student).then((res) => {
         const { data, message } = res.data;
         if (!data) {
           this.$message({ message, type: 'error' });
@@ -494,9 +466,9 @@ export default {
         }
       });
     },
-    //修改职工状态
+    //修改学生状态
     updateUserState(row) {
-      this.$api.employee.updateUserState(row.employeeId, row.status).then((res) => {
+      this.$api.student.updateUserState(row.studentId, row.status).then((res) => {
         const { data, message } = res.data;
         if (!data) {
           this.$message({ message, type: 'error' });
@@ -512,11 +484,15 @@ export default {
     },
     openuploadNoteDialog(row) {
       this.dialogObject.uploadNoteVisible = true;
-      this.userForm = { ...row };
+      this.studentForm = { ...row };
     },
     //上传简历
     uploadUserNote(param) {
-      if (param.file.name.indexOf('docx') == -1 && param.file.name.indexOf('doc') == -1 && param.file.name.indexOf('pdf') == -1) {
+      if (
+        param.file.name.indexOf('docx') == -1 &&
+        param.file.name.indexOf('doc') == -1 &&
+        param.file.name.indexOf('pdf') == -1
+      ) {
         this.$notify.warning({
           title: '警告',
           message: '请上传格式为.docx .doc .pdf 的文件',
@@ -530,8 +506,8 @@ export default {
         //创建FormData对象(键值对集合) 将模型存在FormData中
         const formdata = new FormData();
         formdata.append('file', param.file);
-        formdata.append('employeeId', this.userForm.employeeId);
-        this.$api.employee.uploadUserNote(formdata).then((res) => {
+        formdata.append('studentId', this.studentForm.studentId);
+        this.$api.student.uploadUserNote(formdata).then((res) => {
           const { data, message } = res.data;
           if (!data) {
             this.$message({ message: message, type: 'error' });
@@ -590,8 +566,8 @@ export default {
     //       break;
     //     }
     //   }
-    //   this.userForm.areadata = '';
-    //   this.userForm.areadata = this.search.province + this.search.city + this.search.district;
+    //   this.studentForm.areadata = '';
+    //   this.studentForm.areadata = this.search.province + this.search.city + this.search.district;
     // },
     //#endregion
   },
@@ -604,23 +580,17 @@ export default {
 <style lang="less" scoped>
 .user_container {
   width: 100%;
-  // height: 100%;
-  .editbar {
-    width: 100%;
-    margin: 5px 0px;
-    padding: 2px 0px;
-    display: grid;
-    grid-template-columns: 1.5fr 1fr;
-    .edit_btn {
+
+  .edit_query {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+
+    >.el-col {
       display: flex;
-      flex-direction: row;
-    }
-    .edit_query {
-      width: 100%;
-      display: grid;
-      //  border: 1px solid red;
-      grid-template-columns: 2fr 2fr 0.5fr 0.5fr;
-      grid-column-gap: 5px;
+      font-size: 16px;
+      color: #606266;
+      margin-right: 5px;
     }
   }
 }

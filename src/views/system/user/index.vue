@@ -30,7 +30,7 @@
           <el-image style="width: 60px; height: 50px" :src="scope.row.headerImgUrl" :preview-src-list="[scope.row.headerImgUrl]"></el-image>
         </template>
       </el-table-column>
-      <el-table-column label="职工名" width="100px" align="center">
+      <el-table-column label="学生名" width="100px" align="center">
         <template slot-scope="scope">
           <el-tag disable-transitions>{{ scope.row.employeeName }}</el-tag>
         </template>
@@ -100,8 +100,8 @@
       >
       </el-pagination>
     </div>
-    <!-- 修改职工信息对话框 -->
-    <el-dialog title="职工信息" center :visible.sync="dialogObject.updateVisible" :close-on-click-modal="false" width="50%">
+    <!-- 修改学生信息对话框 -->
+    <el-dialog title="学生信息" center :visible.sync="dialogObject.updateVisible" :close-on-click-modal="false" width="50%">
       <el-form ref="updateform" :model="userForm" label-width="80px">
         <el-form-item label="证件照">
           <img :src="userForm.headerImgUrl" width="100" height="100" />
@@ -110,7 +110,7 @@
             <el-button style="margin-left: 10px" size="small" type="success" @click="$refs.upload.submit()">上传到服务器</el-button>
           </el-upload>
         </el-form-item>
-        <el-form-item label="职工名称"> <el-input v-model="userForm.employeeName"></el-input> </el-form-item>
+        <el-form-item label="学生名称"> <el-input v-model="userForm.employeeName"></el-input> </el-form-item>
         <el-form-item label="性别">
           <el-radio-group v-model="userForm.sex" size="mini">
             <el-radio :label="1">男</el-radio>
@@ -144,13 +144,13 @@
         <el-button type="success" @click="updateUserInfo()">修 改</el-button>
       </div>
     </el-dialog>
-    <!-- 添加职工信息对话框 -->
-    <el-dialog title="职工信息" center :visible.sync="dialogObject.addVisible" :close-on-click-modal="false" width="50%">
+    <!-- 添加学生信息对话框 -->
+    <el-dialog title="学生信息" center :visible.sync="dialogObject.addVisible" :close-on-click-modal="false" width="50%">
       <el-form :model="userForm" :rules="rules" ref="userForm" label-width="80px">
-        <el-form-item label="职工Id" prop="employeeId">
+        <el-form-item label="学生Id" prop="employeeId">
           <el-input v-model="userForm.employeeId"></el-input>
         </el-form-item>
-        <el-form-item label="职工名" prop="employeeName">
+        <el-form-item label="学生名" prop="employeeName">
           <el-input v-model="userForm.employeeName"></el-input>
         </el-form-item>
         <el-form-item label="性别">
@@ -233,18 +233,18 @@ export default {
         callback('身份证格式有误');
       }
     };
-    //检查职工编号是否存在
+    //检查学生编号是否存在
     const cheackUserId = (rule, value, callback) => {
       const regUserId = /^[A-Za-z0-9]+$/;
       if (!regUserId.test(value)) {
-        return callback(new Error('职工id由英文和数字组成!'));
+        return callback(new Error('学生id由英文和数字组成!'));
       } else {
         this.$api.employee.checkUserExists(value).then((res) => {
           const { data, success, message } = res.data;
           if (success) {
             return callback();
           }
-          callback(new Error('职工Id重复!'));
+          callback(new Error('学生Id重复!'));
         });
       }
     };
@@ -296,7 +296,7 @@ export default {
           { validator: cheackIdNumber, trigger: 'blur' },
         ],
         employeeId: [
-          { required: true, message: '职工Id不能为空', trigger: 'change' },
+          { required: true, message: '学生Id不能为空', trigger: 'change' },
           { min: 3, max: 16, message: '长度在 3 到 16 个字符', trigger: 'blur' },
           { validator: cheackUserId, trigger: 'blur' },
         ],
@@ -338,7 +338,7 @@ export default {
     loadData() {
       this.getUserList();
     },
-    //获取职工数据
+    //获取学生数据
     async getUserList() {
       await this.$api.employee.getUserList(this.queryForm.page, this.queryForm.row, this.queryForm.conditions, this.queryForm.roleId).then((res) => {
         const { data, count } = res.data;
@@ -395,7 +395,7 @@ export default {
         this.userIds.push(element.employeeId);
       });
     },
-    //删除职工
+    //删除学生
     deleteUsers() {
       if (this.userIds.length == 0) {
         this.$message({
@@ -426,7 +426,7 @@ export default {
       this.roleIds = [];
       this.userForm.departmentId = '';
     },
-    //添加新职工
+    //添加新学生
     addUser() {
       this.$refs['userForm'].validate((valid) => {
         if (valid) {
@@ -455,7 +455,7 @@ export default {
         }
       });
     },
-    //上传职工头像
+    //上传学生头像
     uploadUserHeaderImg(param) {
       if (param.file.type != 'image/png' && param.file.type != 'image/gif' && param.file.type != 'image/jpg' && param.file.type != 'image/jpeg') {
         this.$notify.warning({
@@ -495,7 +495,7 @@ export default {
       }
       this.dialogObject.updateVisible = true;
     },
-    //修改职工数据
+    //修改学生数据
     updateUserInfo() {
       const user = {
         employeeId: this.userForm.employeeId,
@@ -517,7 +517,7 @@ export default {
         }
       });
     },
-    //修改职工状态
+    //修改学生状态
     updateUserState(row) {
       this.$api.employee.updateUserState(row.employeeId, row.status).then((res) => {
         const { data, message } = res.data;
