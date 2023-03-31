@@ -1,5 +1,8 @@
+/*
+ * @LastEditTime: 2023-03-31 10:24:48
+ * @Descripttion: 
+ */
 import Mock from "mockjs";
-import homeApi from "./home";
 import menuApi from "./menu";
 import { baseUrl } from "@/config/defaultString";
 
@@ -8,5 +11,4 @@ Mock.setup({
   timeout: "200-2000",
 });
 // ##定义Mock接口##
-Mock.mock(`${baseUrl}/api/gethomeData`, homeApi.getStatisticalData);
 Mock.mock(`${baseUrl}/api/getMenuList`, menuApi.getMenuList);

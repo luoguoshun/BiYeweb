@@ -1,7 +1,12 @@
 export default {
   namespaced: true,
   state: {
-    userInfo: {},
+    userInfo: {
+      employeeId: '',
+      roleIds: 'admin&&',
+      employeeName: '',
+      headerImgUrl: '',
+    },
   },
   getters: {
     userInfo(state) {

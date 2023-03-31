@@ -189,8 +189,8 @@ const routes = [
           keepAlive: keepAlive,
         },
       },
-       //打卡
-       {
+      //打卡
+      {
         path: '/clockIn',
         name: 'clockIn',
         component: () => import(`@/views/clockIn/index`),
@@ -210,7 +210,7 @@ const router = new VueRouter({
 //全局前置导航守卫（路由跳转前执行）
 router.beforeEach((to, from, next) => {
   document.title = to.meta.title || '绩效考核系统';
-  
+
   // 路由对象的matched属性是一个数组，包含了当前路由的所有嵌套路径片段的路由记录。
   //  找到了满足条件的元素,return true,循环结束。如果所有元素全部遍历还是没找到, 最终结果为false
   const isAuth = to.matched.some((i) => i.meta.isAuth == true);

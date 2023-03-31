@@ -52,10 +52,9 @@ export default {
           if (success) {
             try {
               this.setTokenInfo(data);
-              // this.setRouters(data.routers);
               this.setUserInfo(data.userInfo);
               this.connectionSignalR();
-              if (this.$route.query.redirectUrl) {
+              if (this.$route.query.redirectUrl && this.$route.query.redirectUrl.length > 0) {
                 this.$router.replace(this.$route.query.redirectUrl); //跳转至进入登录页前的路由（重定向）
               } else {
                 this.$router.replace('home'); //否则跳转至首页
@@ -99,7 +98,7 @@ export default {
     },
     /**
      * @description: 进入登入界面的时候就去获取地理位置
-     */    
+     */
     getCurrentPosition() {
       const _this = this;
       var geolocation = new BMapGL.Geolocation();

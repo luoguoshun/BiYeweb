@@ -1,5 +1,5 @@
 /*
- * @LastEditTime: 2023-03-24 15:59:04
+ * @LastEditTime: 2023-03-30 16:11:43
  * @Descripttion: 
  */
 import Mock from 'mockjs';
@@ -14,10 +14,12 @@ export default {
           name: 'home',
           label: '首页',
           icon: 'el-icon-s-home',
+          authority:['admin'],
         },
         {
           label: '系统管理',
           icon: 'el-icon-setting',
+          authority:['admin'],
           children: [
             {
               path: '/system/user',
@@ -50,16 +52,19 @@ export default {
           name: 'workAttendance',
           label: '考勤管理',
           icon: 'el-icon-s-operation',
+          authority:['admin'],
         },
         {
           path: '/examine',
           name: 'examine',
           label: '考核管理',
           icon: 'el-icon-s-operation',
+          authority:['admin'],
         },
         {
           label: '日志管理',
           icon: 'el-icon-time',
+          authority:['admin'],
           children: [
             {
               path: '/logs/systemLog',
@@ -80,12 +85,14 @@ export default {
           name: 'message',
           label: '消息通知',
           icon: 'el-icon-chat-dot-square',
+          authority:['admin'],
         },
         {
           path: '/clockIn',
           name: 'clockIn',
           label: '今日打卡',
           icon: 'el-icon-place',
+          authority:['employee'],
         },
       ],
     };

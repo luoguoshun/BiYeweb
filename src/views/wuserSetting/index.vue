@@ -1,6 +1,6 @@
 <!--
- * @LastEditTime: 2023-03-31 11:20:36
- * @Descripttion: 个人设置
+ * @LastEditTime: 2023-03-31 11:17:52
+ * @Descripttion: 个人中心
 -->
 <template>
   <div id="info">
