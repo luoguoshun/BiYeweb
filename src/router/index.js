@@ -128,56 +128,6 @@ const routes = [
           },
         ],
       },
-      //考核管理
-      {
-        path: '/examine',
-        name: 'examine',
-        meta: {
-          title: '考勤管理',
-          isAuth: false,
-        },
-        component: () => import(`@/views/examine`),
-      },
-      //考勤管理
-      {
-        path: '/workAttendance',
-        name: 'workAttendance',
-        meta: {
-          title: '考勤管理',
-          isAuth: false,
-        },
-        component: () => import(`@/views/workAttendance`),
-      },
-      //日志管理
-      {
-        path: '/logs',
-        name: 'logs',
-        component: RouteView,
-        meta: {
-          title: '日志管理',
-          isAuth: true,
-        },
-        children: [
-          {
-            path: 'operateLog',
-            name: 'operateLog',
-            component: () => import('@/views/logs/operateLog'),
-            meta: {
-              title: '操作日志',
-              isAuth: true,
-            },
-          },
-          {
-            path: 'systemLog',
-            name: 'systemLog',
-            component: () => import('@/views/logs/systemLog'),
-            meta: {
-              title: '系统日志',
-              isAuth: true,
-            },
-          },
-        ],
-      },
       //消息通知
       {
         path: '/message',
@@ -185,17 +135,6 @@ const routes = [
         component: () => import(`@/views/message/index`),
         meta: {
           title: '首页',
-          isAuth: false,
-          keepAlive: keepAlive,
-        },
-      },
-      //打卡
-      {
-        path: '/clockIn',
-        name: 'clockIn',
-        component: () => import(`@/views/clockIn/index`),
-        meta: {
-          title: '打卡',
           isAuth: false,
           keepAlive: keepAlive,
         },
