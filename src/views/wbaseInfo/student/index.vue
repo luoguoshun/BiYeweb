@@ -349,29 +349,6 @@ export default {
         console.log(data);
       });
     },
-    //获取角色列表
-    async getRoleList() {
-      await this.$api.role.getRoleList().then((res) => {
-        const { data, success, message } = res.data;
-        if (!success) {
-          console.log(message);
-          return;
-        }
-        this.roleTypes = data;
-      });
-    },
-    //获取部门列表
-    async getDepartmentList() {
-      await this.$api.department.getDepartmentList().then((res) => {
-        const { data, message } = res.data;
-        if (!data) {
-          console.log(message);
-          return;
-        }
-        this.departmentList = data;
-        console.log(data);
-      });
-    },
     //重置搜索条件
     resetQueryForm() {
       this.queryForm.conditions = '';
@@ -619,9 +596,7 @@ export default {
     //#endregion
   },
   created() {
-    this.loadData();
-    this.getRoleList();
-    this.getDepartmentList();
+    // this.loadData();
   },
 };
 </script>

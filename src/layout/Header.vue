@@ -1,5 +1,5 @@
 <!--
- * @LastEditTime: 2023-03-28 16:58:04
+ * @LastEditTime: 2023-03-31 12:00:36
  * @Descripttion: 头部
 -->
 <template>
@@ -57,8 +57,8 @@ export default {
       this.$router.push({ name: 'login' });
     },
     toSetting() {
-      this.$store.commit('lable/createTab', { tabName: '个人设置', routeName: 'userSetting' });
-      this.$router.push({ name: 'userSetting' });
+      this.$store.commit('lable/createTab', { tabName: '个人设置', routeName: 'adminSetting' });
+      this.$router.push({ name: 'adminSetting' });
     },
   },
   created() {

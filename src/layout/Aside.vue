@@ -5,7 +5,7 @@
     :collapse="isCollapse"
     :default-active="$route.path"
     class="el-menu-vertical-demo el-menu"
-    background-color="#04142c"
+    background-color="#324057"
     text-color="#fff"
     active-text-color="#ffd04b"
   >
@@ -41,8 +41,8 @@
   </el-menu>
 </template>
 <script>
-import store from '@/store';
 import { mapGetters, mapMutations } from 'vuex';
+import { menusData2 } from '@/store/enums/system'
 export default {
   computed: {
     /**
@@ -69,7 +69,7 @@ export default {
   },
   data() {
     return {
-      menus: [],
+      menus: menusData2,
     };
   },
   methods: {
@@ -82,11 +82,6 @@ export default {
     },
   },
   created() {
-    //获取菜单数据
-    this.$api.mock.getMenuList().then((res) => {
-      const { code, success, data } = res.data;
-      this.menus = data;
-    });
   },
 };
 </script>

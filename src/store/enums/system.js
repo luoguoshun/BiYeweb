@@ -1,5 +1,5 @@
 /*
- * @LastEditTime: 2023-03-31 10:49:44
+ * @LastEditTime: 2023-03-31 11:49:35
  * @Descripttion: 
  */
 export const gradeData = [
@@ -128,42 +128,32 @@ export const menusData2 = [
     authority: ['admin'],
     children: [
       {
-        path: '/system/user',
+        path: '/baseInfo/student',
         name: 'user',
         label: '学生管理',
         icon: 'el-icon-user-solid',
+        authority: ['admin'],
       },
       {
-        path: '/system/role',
+        path: '/baseInfo/dormitory',
         name: 'role',
-        label: '角色管理',
+        label: '宿舍楼管理',
         icon: 'el-icon-s-custom',
+        authority: ['admin'],
       },
       {
-        path: '/system/department',
+        path: '/baseInfo/dormitoryRoom',
         name: 'department',
-        label: '部门管理',
+        label: '宿舍管理',
         icon: 'el-icon-menu',
-      },
-      {
-        path: '/system/dictionary',
-        name: 'dictionary',
-        label: '字典管理',
-        icon: 'el-icon-notebook-1',
-      },
+        authority: ['admin'],
+      }
     ],
   },
   {
-    path: '/workAttendance',
-    name: 'workAttendance',
-    label: '考勤管理',
-    icon: 'el-icon-s-operation',
-    authority: ['admin'],
-  },
-  {
-    path: '/examine',
-    name: 'examine',
-    label: '考核管理',
+    path: '/notice',
+    name: 'notice',
+    label: '通知管理',
     icon: 'el-icon-s-operation',
     authority: ['admin'],
   },

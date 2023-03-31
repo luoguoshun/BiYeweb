@@ -2,9 +2,9 @@ export default {
   namespaced: true,
   state: {
     userInfo: {
-      employeeId: '',
-      roleIds: 'admin&&',
-      employeeName: '',
+      userId: '',
+      roleIds: 'admin',
+      name: '',
       headerImgUrl: '',
     },
   },

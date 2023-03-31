@@ -64,79 +64,77 @@ const routes = [
           title: '首页',
           isAuth: isAuth,
           keepAlive: keepAlive,
+          authority: ['admin'],
         },
       },
+      //管理员设置中心
       {
-        path: '/userSetting',
-        name: 'userSetting',
-        component: () => import(`@/views/userSetting/index`),
+        path: '/adminSetting',
+        name: 'adminSetting',
+        component: () => import(`@/views/adminSetting/index`),
         meta: {
           title: '个人设置',
           isAuth: isAuth,
           keepAlive: keepAlive,
+          authority: ['admin'],
         },
       },
       //系统管理
       {
-        path: '/system',
-        name: 'system',
+        path: '/baseInfo',
+        name: 'baseInfo',
         component: RouteView,
         meta: {
           title: '系统管理',
           isAuth: isAuth,
+          authority: ['admin'],
         },
         children: [
           {
-            path: 'user',
-            name: 'user',
-            component: () => import(`@/views/system//user/index`),
+            path: 'student',
+            name: 'student',
+            component: () => import(`@/views/wbaseInfo/student/index`),
             meta: {
-              title: '员工管理',
+              title: '学生管理',
               isAuth: isAuth,
               keepAlive: keepAlive,
+              authority: ['admin'],
             },
           },
           {
-            path: 'role',
-            name: 'role',
-            component: () => import(`@/views/system/role/index`),
+            path: 'dormitory',
+            name: 'dormitory',
+            component: () => import(`@/views/wbaseInfo/dormitory/index`),
             meta: {
-              title: '角色管理',
+              title: '宿舍楼管理',
               isAuth: isAuth,
               keepAlive: keepAlive,
+              authority: ['admin'],
             },
           },
           {
-            path: 'department',
-            name: 'department',
-            component: () => import(`@/views/system/department/index`),
+            path: 'dormitoryRoom',
+            name: 'dormitoryRoom',
+            component: () => import(`@/views/wbaseInfo/dormitoryRoom/index`),
             meta: {
-              title: '部门管理',
+              title: '宿舍管理',
               isAuth: isAuth,
               keepAlive: keepAlive,
-            },
-          },
-          {
-            path: 'dictionary',
-            name: 'dictionary',
-            component: () => import(`@/views/system/dictionary/index`),
-            meta: {
-              title: '字典管理',
-              isAuth: false,
-              keepAlive: keepAlive,
+              authority: ['admin'],
             },
           },
         ],
       },
-      //消息通知
+      //通知
       {
-        path: '/message',
-        name: 'message',
-        component: () => import(`@/views/message/index`),
+        path: '/notice',
+        name: 'notice',
+        component: () => import(`@/views/notice/index`),
         meta: {
-          title: '首页',
+          title: '通知',
           isAuth: false,
           keepAlive: keepAlive,
+          authority: ['admin'],
         },
       },
     ],
@@ -148,16 +146,20 @@ const router = new VueRouter({
 });
 //全局前置导航守卫（路由跳转前执行）
 router.beforeEach((to, from, next) => {
-  document.title = to.meta.title || '绩效考核系统';
-
-  // 路由对象的matched属性是一个数组，包含了当前路由的所有嵌套路径片段的路由记录。
-  //  找到了满足条件的元素,return true,循环结束。如果所有元素全部遍历还是没找到, 最终结果为false
+  document.title = to.meta.title || '学生宿舍管理系统';
+  //判断当前角色是否在允许访问范围之内
+  const promise = to.meta.authority.includes(store.getters['user/userInfo'].roleIds);
+  if (!promise) {
+    next({name: from.name})
+  }
+  //matched Is Array&&包含了当前路由的所有嵌套路径片段的路由记录。
+  //找到了满足条件的元素,return true,循环结束。
   const isAuth = to.matched.some((i) => i.meta.isAuth == true);
   if (isAuth) {
-    // 否则判Token时间是否失效
+    // 否则判Token和时间是否失效
     const accessToken = store.getters['token/accessToken'];
     const expiresTime = store.getters['token/expiresTime'];
-    let isExpires = new Date().getTime() > expiresTime;
+    const isExpires = new Date().getTime() > expiresTime;
     if (isExpires || accessToken == null) {
       Message.warning('凭证过期，请重新登录!');
       next({
