@@ -25,14 +25,22 @@
       <el-button type="danger" size="small" plain>危险按钮</el-button>
     </el-row>
     <!-- 表格 -->
-    <el-table :data="table.studentList" @row-dblclick="handleEdit" :header-cell-style="{ 'text-align': 'center' }"
-      @selection-change="selectRows" border="">
+    <el-table
+      :data="table.studentList"
+      @row-dblclick="handleEdit"
+      :header-cell-style="{ 'text-align': 'center' }"
+      @selection-change="selectRows"
+      border=""
+    >
       <!-- <el-table-column type="selection" width="40" align="center"> </el-table-column> -->
       <el-table-column fixed prop="studentId" label="编号" width="120px" align="center"> </el-table-column>
       <el-table-column label="证件照" width="100" align="center">
         <template slot-scope="scope">
-          <el-image style="width: 60px; height: 50px" :src="scope.row.headerImgUrl"
-            :preview-src-list="[scope.row.headerImgUrl]"></el-image>
+          <el-image
+            style="width: 60px; height: 50px"
+            :src="scope.row.headerImgUrl"
+            :preview-src-list="[scope.row.headerImgUrl]"
+          ></el-image>
         </template>
       </el-table-column>
       <el-table-column label="学生名" width="100px" align="center">
@@ -56,23 +64,17 @@
           {{ leaveTime(scope.row.createTime) }}
         </template>
       </el-table-column>
-      <el-table-column prop="state" label="状态" align="center">
+      <el-table-column prop="status" label="状态" align="center">
         <template slot-scope="scope">
-          <el-switch class="switch" :inactive-value="0" :active-value="1" active-color="rgb(0, 255, 149)"
-            inactive-color="rgb(151, 148, 148)" v-model="scope.row.status" @change="updateUserState(scope.row)" />
-        </template>
-      </el-table-column>
-      <el-table-column prop="noteSrc" label="简历" align="center" width="200px">
-        <template slot-scope="scope">
-          <el-button v-if="scope.row.noteSrc == null || scope.row.noteSrc == ''" type="primary"
-            @click="openuploadNoteDialog(scope.row)" size="mini">
-            上传简历
-          </el-button>
-          <el-button v-else type="primary" @click="openuploadNoteDialog(scope.row)" size="mini"> 重新上传 </el-button>
-          <el-button v-if="scope.row.noteSrc !== '' && scope.row.noteSrc != null" type="primary"
-            @click="notePreview(scope.row)" size="mini">
-            预览
-          </el-button>
+          <el-switch
+            class="switch"
+            :inactive-value="0"
+            :active-value="1"
+            active-color="rgb(0, 255, 149)"
+            inactive-color="rgb(151, 148, 148)"
+            v-model="scope.row.status"
+            @change="updateUserstatus(scope.row)"
+          />
         </template>
       </el-table-column>
       <el-table-column fixed="right" label="操作" align="center">
@@ -84,20 +86,34 @@
     </el-table>
     <!-- 分页 -->
     <div class="block">
-      <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :total="table.total"
-        :page-sizes="[5, 10, 15, 20]" :current-page="queryForm.page" :page-size="queryForm.row"
-        layout="total, sizes, prev, pager, next, jumper" background>
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :total="table.total"
+        :page-sizes="[5, 10, 15, 20]"
+        :current-page="queryForm.page"
+        :page-size="queryForm.row"
+        layout="total, sizes, prev, pager, next, jumper"
+        background
+      >
       </el-pagination>
     </div>
     <!-- 修改学生信息对话框 -->
-    <el-dialog title="学生信息" center :visible.sync="dialogObject.updateVisible" :close-on-click-modal="false" width="50%">
+    <el-dialog
+      title="学生信息"
+      center
+      :visible.sync="dialogObject.updateVisible"
+      :close-on-click-modal="false"
+      width="50%"
+    >
       <el-form ref="updateform" :model="studentForm" label-width="80px">
         <el-form-item label="证件照">
           <img :src="studentForm.headerImgUrl" width="100" height="100" />
           <el-upload ref="upload" action="" :http-request="uploadUserHeaderImg" :auto-upload="false" :limit="1">
             <el-button slot="trigger" size="small" type="primary"> 选取文件 </el-button>
-            <el-button style="margin-left: 10px" size="small" type="success"
-              @click="$refs.upload.submit()">上传到服务器</el-button>
+            <el-button style="margin-left: 10px" size="small" type="success" @click="$refs.upload.submit()"
+              >上传到服务器</el-button
+            >
           </el-upload>
         </el-form-item>
         <el-form-item label="学生名称"> <el-input v-model="studentForm.name"></el-input> </el-form-item>
@@ -109,8 +125,12 @@
         </el-form-item>
         <el-form-item label="部门">
           <el-select v-model="studentForm.departmentId" filterable placeholder="请选择部门">
-            <el-option v-for="item in departmentList" :key="item.departmentId" :label="item.departmentName"
-              :value="item.departmentId"></el-option>
+            <el-option
+              v-for="item in dormitoryList"
+              :key="item.departmentId"
+              :label="item.departmentName"
+              :value="item.departmentId"
+            ></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="角色">
@@ -123,9 +143,6 @@
         <el-form-item label="联系方式">
           <el-input type="text" v-model="studentForm.phone"></el-input>
         </el-form-item>
-        <!-- <el-form-item label="省区">
-          <el-cascader size="large" :options="options" v-model="selectedOptions" @change="handleChange"> </el-cascader>
-        </el-form-item> -->
         <el-form-item label="地址">
           <el-input type="text" v-model="studentForm.address"></el-input>
         </el-form-item>
@@ -136,7 +153,13 @@
       </div>
     </el-dialog>
     <!-- 添加学生信息对话框 -->
-    <el-dialog title="学生信息" center :visible.sync="dialogObject.addVisible" :close-on-click-modal="false" width="50%">
+    <el-dialog
+      title="学生信息"
+      center
+      :visible.sync="dialogObject.addVisible"
+      :close-on-click-modal="false"
+      width="50%"
+    >
       <el-form :model="studentForm" :rules="rules" ref="studentForm" label-width="80px">
         <el-form-item label="学生Id" prop="studentId">
           <el-input v-model="studentForm.studentId"></el-input>
@@ -152,16 +175,17 @@
         </el-form-item>
         <el-form-item label="部门">
           <el-select v-model="studentForm.departmentId" filterable placeholder="请选择部门">
-            <el-option v-for="item in departmentList" :key="item.departmentId" :label="item.departmentName"
-              :value="item.departmentId"></el-option>
+            <el-option
+              v-for="item in dormitoryList"
+              :key="item.departmentId"
+              :label="item.departmentName"
+              :value="item.departmentId"
+            ></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="联系方式" prop="phone">
           <el-input type="text" v-model="studentForm.phone"></el-input>
         </el-form-item>
-        <!-- <el-form-item label="省区">
-          <el-cascader size="large" :options="options" v-model="selectedOptions" @change="handleChange"> </el-cascader>
-        </el-form-item> -->
         <el-form-item label="地址">
           <el-input type="text" v-model="studentForm.address"></el-input>
         </el-form-item>
@@ -172,17 +196,19 @@
       </div>
     </el-dialog>
     <!-- 简历上传 -->
-    <el-dialog title="简历上传" center :visible.sync="dialogObject.uploadNoteVisible" :close-on-click-modal="false"
-      width="30%">
+    <el-dialog
+      title="简历上传"
+      center
+      :visible.sync="dialogObject.uploadNoteVisible"
+      :close-on-click-modal="false"
+      width="30%"
+    >
       <el-upload class="upload-demo" drag action="" :http-request="uploadUserNote" :file-list="noteFileList">
         <i class="el-icon-upload"></i>
         <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
         <div class="el-upload__tip" slot="tip">只能上传jpg/png文件，且不超过500kb</div>
-      </el-upload></el-dialog>
-    <el-dialog title="简历预览" center :visible.sync="dialogObject.notepreviewVisible" :close-on-click-modal="false"
-      width="60%">
-      <pdf ref="pdf" v-for="i in numPages" :key="i" :src="noteSrc" :page="i"></pdf>
-    </el-dialog>
+      </el-upload></el-dialog
+    >
   </div>
 </template>
 
@@ -252,7 +278,6 @@ export default {
         updateVisible: false,
         addVisible: false,
         uploadNoteVisible: false,
-        notepreviewVisible: false,
       },
       studentForm: {
         studentId: '',
@@ -262,12 +287,11 @@ export default {
         IdNumber: '',
         address: '',
         phone: '',
-        roleIds: '',
-        state: 0,
-        departmentId: '',
-        areadata: '',
+        status: 0,
+        dormitoryId: '',
+        dormitoryRoomId: '',
+        speciality:'',
       },
-      roleIds: [],
       roleTypes: [],
       rules: {
         name: [
@@ -289,13 +313,10 @@ export default {
           { validator: cheackUserId, trigger: 'blur' },
         ],
       },
-      departmentList: [],
+      dormitoryList: [],
       options: [],
-      selectedOptions: [],
       search: { current: 1, size: 6 },
       noteFileList: [],
-      numPages: '', //pdf总页数
-      noteSrc: '',
     };
   },
   methods: {
@@ -362,7 +383,9 @@ export default {
       this.studentForm.sex = 1;
       this.studentForm.address = '';
       this.studentForm.phone = '';
-      this.studentForm.departmentId = '';
+      this.studentForm.dormitoryId = '';
+      this.studentForm.dormitoryRoomId = '';
+      this.studentForm.speciality = '';
     },
     //添加新学生
     add() {
@@ -374,7 +397,6 @@ export default {
             sex: this.studentForm.sex,
             address: this.studentForm.address,
             phone: this.studentForm.phone,
-            roleIds: this.roleIds,
             departmentId: this.studentForm.departmentId,
           };
           this.$api.student.add(Student).then((res) => {
@@ -467,8 +489,8 @@ export default {
       });
     },
     //修改学生状态
-    updateUserState(row) {
-      this.$api.student.updateUserState(row.studentId, row.status).then((res) => {
+    updateUserstatus(row) {
+      this.$api.student.updateUserstatus(row.studentId, row.status).then((res) => {
         const { data, message } = res.data;
         if (!data) {
           this.$message({ message, type: 'error' });
@@ -520,56 +542,6 @@ export default {
         });
       }
     },
-    //在线预览简历
-    notePreview(row) {
-      this.dialogObject.notepreviewVisible = true;
-      this.noteSrc = row.noteSrcUrl;
-      if (this.noteSrc.indexOf('pdf')) {
-        let loadingTask = pdf.createLoadingTask(row.noteSrcUrl);
-        loadingTask.promise
-          .then((pdf) => {
-            this.numPages = pdf.numPages;
-          })
-          .catch((err) => {
-            console.error('pdf 加载失败', err);
-          });
-      }
-    },
-    //#region
-    // //地址框选择触发
-    // handleChange(value) {
-    //   this.search.province = '';
-    //   this.search.city = '';
-    //   this.search.district = '';
-    //   for (var k = 0, lengthk = provinceAndCity.length; k < lengthk; k++) {
-    //     //确定省
-    //     if (provinceAndCity[k].code == value[0]) {
-    //       this.search.province = provinceAndCity[k].name;
-    //       if (provinceAndCity[k].cityList && value.length >= 2 && value[1] != '') {
-    //         for (var i = 0, lengthi = provinceAndCity[k].cityList.length; i < lengthi; i++) {
-    //           //确定市
-    //           if (provinceAndCity[k].cityList[i].code == value[1] || provinceAndCity[k].cityList.length == 1) {
-    //             this.search.city = provinceAndCity[k].cityList[i].name;
-    //             //确定区
-    //             if (provinceAndCity[k].cityList[i].areaList && value.length == 3 && value[2] != '') {
-    //               for (var j = 0, lengthj = provinceAndCity[k].cityList[i].areaList.length; j < lengthj; j++) {
-    //                 if (provinceAndCity[k].cityList[i].areaList[j].code == value[2]) {
-    //                   this.search.district = provinceAndCity[k].cityList[i].areaList[j].name;
-    //                   break;
-    //                 }
-    //               }
-    //             }
-    //             break;
-    //           }
-    //         }
-    //       }
-    //       break;
-    //     }
-    //   }
-    //   this.studentForm.areadata = '';
-    //   this.studentForm.areadata = this.search.province + this.search.city + this.search.district;
-    // },
-    //#endregion
   },
   created() {
     // this.loadData();
@@ -580,13 +552,12 @@ export default {
 <style lang="less" scoped>
 .user_container {
   width: 100%;
-
   .edit_query {
     display: flex;
     align-items: center;
     margin-bottom: 10px;
 
-    >.el-col {
+    > .el-col {
       display: flex;
       font-size: 16px;
       color: #606266;

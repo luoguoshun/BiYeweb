@@ -30,7 +30,7 @@ export default {
       NewPwd: newPwd,
     });
   },
-  add() {
+  add(student) {
     return axios.post('/api/Background/Student/Add', student);
   },
 };
