@@ -104,8 +104,15 @@ export const menusData2 = [
     authority: ['admin'],
     children: [
       {
+        path: '/baseInfo/administrator',
+        name: 'administrator',
+        label: '学生管理',
+        icon: 'el-icon-user-solid',
+        authority: ['admin'],
+      },
+      {
         path: '/baseInfo/student',
-        name: 'user',
+        name: 'student',
         label: '学生管理',
         icon: 'el-icon-user-solid',
         authority: ['admin'],

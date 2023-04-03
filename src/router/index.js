@@ -91,6 +91,17 @@ const routes = [
         },
         children: [
           {
+            path: 'administrator',
+            name: 'administrator',
+            component: () => import(`@/views/wbaseInfo/administrator/index`),
+            meta: {
+              title: '宿舍管理员',
+              isAuth: isAuth,
+              keepAlive: keepAlive,
+              authority: ['admin'],
+            },
+          },
+          {
             path: 'student',
             name: 'student',
             component: () => import(`@/views/wbaseInfo/student/index`),
