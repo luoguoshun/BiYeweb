@@ -10,7 +10,7 @@ export default {
       message: 'success',
       data: [
         {
-          path: '/',
+          path: '/home',
           name: 'home',
           label: '首页',
           icon: 'el-icon-s-home',

@@ -8,7 +8,12 @@
       </div>
       <div class="edit_query">
         <el-select size="mini" v-model="queryForm.roleId" placeholder="请选择角色类别">
-          <el-option v-for="item in roleTypes" :key="item.roleId" :label="item.roleName" :value="item.roleId"></el-option>
+          <el-option
+            v-for="item in roleTypes"
+            :key="item.roleId"
+            :label="item.roleName"
+            :value="item.roleId"
+          ></el-option>
         </el-select>
         <el-input v-model="queryForm.conditions" size="mini" label-width="80px" placeholder="请输入"></el-input>
         <el-button type="primary" @click="loadData()" size="mini">查找</el-button>
@@ -27,7 +32,11 @@
       <el-table-column fixed prop="employeeId" label="编号" width="120px" align="center"> </el-table-column>
       <el-table-column label="证件照" width="100" align="center">
         <template slot-scope="scope">
-          <el-image style="width: 60px; height: 50px" :src="scope.row.headerImgUrl" :preview-src-list="[scope.row.headerImgUrl]"></el-image>
+          <el-image
+            style="width: 60px; height: 50px"
+            :src="scope.row.headerImgUrl"
+            :preview-src-list="[scope.row.headerImgUrl]"
+          ></el-image>
         </template>
       </el-table-column>
       <el-table-column label="职工名" width="100px" align="center">
@@ -71,11 +80,21 @@
       </el-table-column>
       <el-table-column prop="noteSrc" label="简历" align="center" width="200px">
         <template slot-scope="scope">
-          <el-button v-if="scope.row.noteSrc == null || scope.row.noteSrc == ''" type="primary" @click="openuploadNoteDialog(scope.row)" size="mini">
+          <el-button
+            v-if="scope.row.noteSrc == null || scope.row.noteSrc == ''"
+            type="primary"
+            @click="openuploadNoteDialog(scope.row)"
+            size="mini"
+          >
             上传简历
           </el-button>
           <el-button v-else type="primary" @click="openuploadNoteDialog(scope.row)" size="mini"> 重新上传 </el-button>
-          <el-button v-if="scope.row.noteSrc !== '' && scope.row.noteSrc != null" type="primary" @click="notePreview(scope.row)" size="mini">
+          <el-button
+            v-if="scope.row.noteSrc !== '' && scope.row.noteSrc != null"
+            type="primary"
+            @click="notePreview(scope.row)"
+            size="mini"
+          >
             预览
           </el-button>
         </template>
@@ -101,13 +120,21 @@
       </el-pagination>
     </div>
     <!-- 修改职工信息对话框 -->
-    <el-dialog title="职工信息" center :visible.sync="dialogObject.updateVisible" :close-on-click-modal="false" width="50%">
+    <el-dialog
+      title="职工信息"
+      center
+      :visible.sync="dialogObject.updateVisible"
+      :close-on-click-modal="false"
+      width="50%"
+    >
       <el-form ref="updateform" :model="userForm" label-width="80px">
         <el-form-item label="证件照">
           <img :src="userForm.headerImgUrl" width="100" height="100" />
           <el-upload ref="upload" action="" :http-request="uploadUserHeaderImg" :auto-upload="false" :limit="1">
             <el-button slot="trigger" size="small" type="primary"> 选取文件 </el-button>
-            <el-button style="margin-left: 10px" size="small" type="success" @click="$refs.upload.submit()">上传到服务器</el-button>
+            <el-button style="margin-left: 10px" size="small" type="success" @click="$refs.upload.submit()"
+              >上传到服务器</el-button
+            >
           </el-upload>
         </el-form-item>
         <el-form-item label="职工名称"> <el-input v-model="userForm.employeeName"></el-input> </el-form-item>
@@ -119,7 +146,12 @@
         </el-form-item>
         <el-form-item label="部门">
           <el-select v-model="userForm.departmentId" filterable placeholder="请选择部门">
-            <el-option v-for="item in departmentList" :key="item.departmentId" :label="item.departmentName" :value="item.departmentId"></el-option>
+            <el-option
+              v-for="item in departmentList"
+              :key="item.departmentId"
+              :label="item.departmentName"
+              :value="item.departmentId"
+            ></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="角色">
@@ -145,7 +177,13 @@
       </div>
     </el-dialog>
     <!-- 添加职工信息对话框 -->
-    <el-dialog title="职工信息" center :visible.sync="dialogObject.addVisible" :close-on-click-modal="false" width="50%">
+    <el-dialog
+      title="职工信息"
+      center
+      :visible.sync="dialogObject.addVisible"
+      :close-on-click-modal="false"
+      width="50%"
+    >
       <el-form :model="userForm" :rules="rules" ref="userForm" label-width="80px">
         <el-form-item label="职工Id" prop="employeeId">
           <el-input v-model="userForm.employeeId"></el-input>
@@ -161,7 +199,12 @@
         </el-form-item>
         <el-form-item label="部门">
           <el-select v-model="userForm.departmentId" filterable placeholder="请选择部门">
-            <el-option v-for="item in departmentList" :key="item.departmentId" :label="item.departmentName" :value="item.departmentId"></el-option>
+            <el-option
+              v-for="item in departmentList"
+              :key="item.departmentId"
+              :label="item.departmentName"
+              :value="item.departmentId"
+            ></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="联系方式" prop="phone">
@@ -180,14 +223,26 @@
       </div>
     </el-dialog>
     <!-- 简历上传 -->
-    <el-dialog title="简历上传" center :visible.sync="dialogObject.uploadNoteVisible" :close-on-click-modal="false" width="30%">
+    <el-dialog
+      title="简历上传"
+      center
+      :visible.sync="dialogObject.uploadNoteVisible"
+      :close-on-click-modal="false"
+      width="30%"
+    >
       <el-upload class="upload-demo" drag action="" :http-request="uploadUserNote" :file-list="noteFileList">
         <i class="el-icon-upload"></i>
         <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
         <div class="el-upload__tip" slot="tip">只能上传jpg/png文件，且不超过500kb</div>
       </el-upload></el-dialog
     >
-    <el-dialog title="简历预览" center :visible.sync="dialogObject.notepreviewVisible" :close-on-click-modal="false" width="60%">
+    <el-dialog
+      title="简历预览"
+      center
+      :visible.sync="dialogObject.notepreviewVisible"
+      :close-on-click-modal="false"
+      width="60%"
+    >
       <pdf ref="pdf" v-for="i in numPages" :key="i" :src="noteSrc" :page="i"></pdf>
     </el-dialog>
   </div>
@@ -340,14 +395,16 @@ export default {
     },
     //获取职工数据
     async getUserList() {
-      await this.$api.employee.getUserList(this.queryForm.page, this.queryForm.row, this.queryForm.conditions, this.queryForm.roleId).then((res) => {
-        const { data, count } = res.data;
-        if (data) {
-          this.table.userList = data;
-          this.table.total = count;
-        }
-        console.log(data);
-      });
+      await this.$api.employee
+        .getUserList(this.queryForm.page, this.queryForm.row, this.queryForm.conditions, this.queryForm.roleId)
+        .then((res) => {
+          const { data, count } = res.data;
+          if (data) {
+            this.table.userList = data;
+            this.table.total = count;
+          }
+          console.log(data);
+        });
     },
     //获取角色列表
     async getRoleList() {
@@ -404,7 +461,7 @@ export default {
         });
       } else {
         this.$api.employee.deleteUsersById(this.userIds).then((res) => {
-          let { data,success, message } = res.data;
+          let { data, success, message } = res.data;
           if (!data) {
             console.log(message);
             this.$message.error('删除失败！');
@@ -457,7 +514,12 @@ export default {
     },
     //上传职工头像
     uploadUserHeaderImg(param) {
-      if (param.file.type != 'image/png' && param.file.type != 'image/gif' && param.file.type != 'image/jpg' && param.file.type != 'image/jpeg') {
+      if (
+        param.file.type != 'image/png' &&
+        param.file.type != 'image/gif' &&
+        param.file.type != 'image/jpg' &&
+        param.file.type != 'image/jpeg'
+      ) {
         this.$notify.warning({
           title: '警告',
           message: '请上传格式为.png .gif .jpg .jpeg的图片',
@@ -539,7 +601,11 @@ export default {
     },
     //上传简历
     uploadUserNote(param) {
-      if (param.file.name.indexOf('docx') == -1 && param.file.name.indexOf('doc') == -1 && param.file.name.indexOf('pdf') == -1) {
+      if (
+        param.file.name.indexOf('docx') == -1 &&
+        param.file.name.indexOf('doc') == -1 &&
+        param.file.name.indexOf('pdf') == -1
+      ) {
         this.$notify.warning({
           title: '警告',
           message: '请上传格式为.docx .doc .pdf 的文件',

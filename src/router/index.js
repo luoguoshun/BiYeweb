@@ -9,7 +9,7 @@ const VueRouterPush = VueRouter.prototype.push;
 VueRouter.prototype.push = function push(to) {
   return VueRouterPush.call(this, to).catch((err) => err);
 };
-const isAuth = false; //是否需要认证
+const isAuth = true; //是否需要认证
 const keepAlive = true; //保持组件状态
 const routes = [
   //基础路由
@@ -33,21 +33,22 @@ const routes = [
       const token = store.getters['token/accessToken'];
       const expiresTime = store.getters['token/expiresTime'];
       let isExpires = new Date().getTime() > expiresTime;
+      debugger
       const groupId = 2;
-      if (!token && !token.length && !isExpires) {
+      if (!token && !token.length && isExpires) {
         return '/login';
       }
       // 根据组别 ID 进行跳转
       switch (groupId) {
         // 管理员跳去仪表盘
         case 1:
-          return '/dashboard';
+          return '/home';
         // 普通用户跳去首页
         case 2:
           return '/home';
         // 其他都认为未登录，跳去登录页
         default:
-          return '/login';
+          return '/home';
       }
     },
     meta: {
@@ -122,7 +123,7 @@ const routes = [
             component: () => import(`@/views/system/dictionary/index`),
             meta: {
               title: '字典管理',
-              isAuth: false,
+              isAuth: isAuth,
               keepAlive: keepAlive,
             },
           },
@@ -134,7 +135,7 @@ const routes = [
         name: 'examine',
         meta: {
           title: '考勤管理',
-          isAuth: false,
+          isAuth: isAuth,
         },
         component: () => import(`@/views/examine`),
       },
@@ -144,7 +145,7 @@ const routes = [
         name: 'workAttendance',
         meta: {
           title: '考勤管理',
-          isAuth: false,
+          isAuth: isAuth,
         },
         component: () => import(`@/views/workAttendance`),
       },
@@ -155,7 +156,7 @@ const routes = [
         component: RouteView,
         meta: {
           title: '日志管理',
-          isAuth: true,
+          isAuth: isAuth,
         },
         children: [
           {
@@ -164,7 +165,7 @@ const routes = [
             component: () => import('@/views/logs/operateLog'),
             meta: {
               title: '操作日志',
-              isAuth: true,
+              isAuth: isAuth,
             },
           },
           {
@@ -173,7 +174,7 @@ const routes = [
             component: () => import('@/views/logs/systemLog'),
             meta: {
               title: '系统日志',
-              isAuth: true,
+              isAuth: isAuth,
             },
           },
         ],
@@ -185,7 +186,7 @@ const routes = [
         component: () => import(`@/views/message/index`),
         meta: {
           title: '首页',
-          isAuth: false,
+          isAuth: isAuth,
           keepAlive: keepAlive,
         },
       },
@@ -196,7 +197,7 @@ const routes = [
         component: () => import(`@/views/clockIn/index`),
         meta: {
           title: '打卡',
-          isAuth: false,
+          isAuth: isAuth,
           keepAlive: keepAlive,
         },
       },

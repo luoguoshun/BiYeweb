@@ -1,12 +1,12 @@
 <!--
- * @LastEditTime: 2023-03-28 11:03:23
+ * @LastEditTime: 2023-05-02 14:00:14
  * @Descripttion: 个人设置
 -->
 <template>
   <div id="info">
     <el-row class="updatePwd-from">
       <el-col :span="10">
-        <el-form :model="updateForm" :rules="updatePwdRules" ref="updateForm" label-width="100px" status-icon>
+        <el-form ref="updateForm" :model="updateForm" :rules="updatePwdRules"  label-width="100px" status-icon>
           <el-form-item label="原密码" prop="oldPwd" required>
             <el-input type="password" v-model="updateForm.oldPwd" autocomplete="off"></el-input>
           </el-form-item>
@@ -28,22 +28,22 @@
 <script>
 export default {
   data() {
-    var checkOldPwd = (rule,value, callback) => {
-      if (!value||value === '') {
+    var checkOldPwd = (rule, value, callback) => {
+      if (!value || value === '') {
         return callback(new Error('请输入密码'));
       } else {
         callback();
       }
     };
-    var checkNewPwd = (rule,value, callback) => {
-      if (!value||value === '') {
+    var checkNewPwd = (rule, value, callback) => {
+      if (!value || value === '') {
         callback(new Error('请输入新密码'));
       } else {
         if (this.updateForm.newPws !== '') this.$refs.updateForm.validateField('checkconfirmPwd');
         callback();
       }
     };
-    var checkconfirmPwd = (rule,value, callback) => {
+    var checkconfirmPwd = (rule, value, callback) => {
       if (value === '') {
         callback(new Error('请再次输入密码'));
       } else if (value !== this.updateForm.newPwd) {
@@ -54,6 +54,7 @@ export default {
     };
     return {
       updateForm: {
+        userId: '',
         oldPwd: '',
         newPwd: '',
         confirmPwd: '',
@@ -70,30 +71,33 @@ export default {
     updatePwd(updateForm) {
       this.$refs[updateForm].validate((valid) => {
         if (valid) {
-          this.$api.admin.updatePwd(userInfo.userId, this.updateForm.oldPwd, this.updateForm.newPwd).then((res) => {
-            const { data, resultType, message } = res.data;
-            if (resultType && resultType == 1) {
-              this.updateDialog.visible = false;
-              this.$message({
-                message: '修改成功!登入失效,请重新登入！',
-                type: 'success',
-                center: true,
-              });
-              this.exitLogin();
-            } else {
-              this.$message({
-                message: message,
-                type: 'warning',
-                center: true,
-              });
-            }
-          });
+          this.$api.employee
+            .updatePwd(this.updateForm.userId, this.updateForm.oldPwd, this.updateForm.newPwd)
+            .then((res) => {
+              const { data, resultType, message } = res.data;
+              if (resultType && resultType == 1) {
+                this.$message({
+                  message: '修改成功!',
+                  type: 'success',
+                  center: true,
+                });
+              } else {
+                this.$message({
+                  message: message,
+                  type: 'warning',
+                  center: true,
+                });
+              }
+            });
         } else {
           console.log('error submit!!');
           return false;
         }
       });
     },
+  },
+  created() {
+    this.updateForm.userId = this.$store.getters['user/userInfo']['employeeId'];
   },
 };
 </script>

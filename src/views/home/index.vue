@@ -20,11 +20,7 @@
         <el-tabs v-model="activeName" type="card">
           <el-tab-pane label="系统通知" name="systemMessage">
             <el-collapse v-model="activeSysMessageId" accordion>
-              <el-collapse-item
-                v-for="item in systemMessageList"
-                :key="item.messageId"
-                :name="item.messageId"
-              >
+              <el-collapse-item v-for="item in systemMessageList" :key="item.messageId" :name="item.messageId">
                 <template slot="title">
                   <h4>{{ item.title }}</h4>
                 </template>
@@ -43,11 +39,7 @@
           </el-tab-pane>
           <el-tab-pane label="我的消息" name="second">
             <el-collapse v-model="activeMyMessageId" @change="readMessage" accordion>
-              <el-collapse-item
-                v-for="item in messageList"
-                :key="item.messageId"
-                :name="item.messageId"
-              >
+              <el-collapse-item v-for="item in messageList" :key="item.messageId" :name="item.messageId">
                 <template slot="title">
                   <i class="el-icon-chat-dot-round"></i>
                   <h4>{{ item.title }}</h4>
@@ -270,7 +262,6 @@ export default {
             ],
           });
 
-          
           myChart2.setOption({
             legend: {},
             tooltip: {},
@@ -282,8 +273,6 @@ export default {
             yAxis: {},
             series: [{ type: 'bar' }, { type: 'bar' }],
           });
-        
-        
         }
       });
     },

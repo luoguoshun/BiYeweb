@@ -58,7 +58,7 @@ export default {
   //修改密码
   updatePwd(adminNo, oldPwd, newPwd) {
     return axios.post('/api/Background/Employee/UpdatePwd', {
-      AdminNo: adminNo,
+      EmployeeId: adminNo,
       OldPwd: oldPwd,
       NewPwd: newPwd,
     });

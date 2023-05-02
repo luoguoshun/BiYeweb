@@ -52,7 +52,6 @@ export default {
           if (success) {
             try {
               this.setTokenInfo(data);
-              // this.setRouters(data.routers);
               this.setUserInfo(data.userInfo);
               this.connectionSignalR();
               if (this.$route.query.redirectUrl) {

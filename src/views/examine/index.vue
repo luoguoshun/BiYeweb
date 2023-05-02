@@ -69,6 +69,7 @@
       <el-table-column prop="id" label="编号" align="center"> </el-table-column>
       <el-table-column prop="statusStr" label="状态" align="center">
         <template slot-scope="scope">
+          <el-tag v-if="scope.row.status == 1">{{ scope.row.statusStr }}</el-tag>
           <el-tag v-if="scope.row.status == 2">{{ scope.row.statusStr }}</el-tag>
           <el-tag type="warning" v-if="scope.row.status == 4">{{ scope.row.statusStr }}</el-tag>
           <!-- <el-tag type="danger">标签五</el-tag> -->
